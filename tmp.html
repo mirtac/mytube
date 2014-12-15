@@ -1,0 +1,101 @@
+
+<head>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs
+/jquery/1.4.0/jquery.min.js">
+</script>
+<script>
+function getData() {
+		url = 'http://140.123.101.183:5182/~tan/data/youtube/search.php';
+		/*		tmp = document.getElementById('keyword').value;
+				if(tmp == ''){
+				alert('no input in text box');
+				}
+
+				url += "?"+"keyword="+tmp;
+		 */
+		req = false;
+		if(window.XMLHttpRequest) {
+				try { req = new XMLHttpRequest();
+				} catch(e) {
+						req = false; }
+		} else if(window.ActiveXObject) {
+				try { req = new ActiveXObject("Msxml2.XMLHTTP");
+				} catch(e) {
+						try { req = new ActiveXObject("Microsoft.XMLHTTP");
+						} catch(e) { req = false; } 
+				} 
+		}
+		if(req) { 
+				//				document.getElementById("dataTable").innerHTML = 'loading data';
+				req.onreadystatechange = processReqChange;
+				req.open("POST", url, true);
+				req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				req.send("search="+$("#search").val());
+				//				$("#video").html("search="+$("#search").val());
+		}
+		return true;
+}
+function processReqChange(){
+		if(req.readyState==4){
+				tmp = req.responseText;
+				$("#video").html(tmp);
+				obj = JSON.parse(tmp);
+				console.log(obj);
+				parseJsonToList();
+		}
+}
+function parseJsonToList(){
+		var innerstring='';
+		for(var i = 0; i < obj.length; i++) {
+				tmp = obj[i];
+				innerstring+='<div class="videoList" id="'+obj[i].id+'" onclick="playvideo(this)"><img id="'
+						innerstring+=obj[i].id+'"src="http://i.ytimg.com/vi/'+obj[i].id;
+				innerstring+='/mqdefault.jpg" onerror="imgError(this)"/><div class="info"><div class="title">';
+				innerstring+=obj[i].title+'</div><div><span class="published">'+obj[i].published;
+				innerstring+='</span><span class="author">'+obj[i].author+'</span></div><span class="duration">';
+				innerstring+=obj[i].duration+'</span><div class="viewCount">'+obj[i].viewCount
+						innerstring+='</div></div>';
+				innerstring+='<span class="jsondata">'+JSON.stringify(obj[i])+'</span></div>';
+		}
+		$("#video").html(innerstring);
+		//console.log("###!"+$("#"+obj[0].id+" .jsondata").text());
+
+}
+function playvideo(video){
+		tmp = video.getElementsByClassName('jsondata')[0].innerHTML;
+		$("#video").html(tmp);
+}
+function imgError(image) {
+		image.onerror = "";
+		image.src = "http://i.ytimg.com/vi_webp/"+image.id+"/default.webp";
+		return true;
+}
+</script>
+</head>
+<body>
+<div class="topbar">
+<div class="searchBox">
+<form method="post" name="info" action="/youtube/search.php">
+<input type="text" id="search" name="search" placeholder="search">
+<input type="button" onclick="getData()" value="search">
+order by:<select name="orderBy"> 
+<option value="viewCount" selected="selected">view count</option>
+<option value="published"> creation time</option>
+<option value="duration">video length</option>
+</select>
+</form>
+</div>
+</div>
+<div class="pageContainer">
+<div class="video" id="video"><div class="videoList" id="9bZkp7q19f0" onclick="playvideo(this)"><img id="9bZkp7q19f0" src="http://i.ytimg.com/vi/9bZkp7q19f0/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">PSY - GANGNAM STYLE (강남스타일) M/V</div><div><span class="published">2012-07-15 07:46:32</span><span class="author">officialpsy</span></div><span class="duration">253</span><div class="viewCount">2086455425</div></div><span class="jsondata">{"id":"9bZkp7q19f0","title":"PSY - GANGNAM STYLE (강남스타일) M/V","published":"2012-07-15 07:46:32","content":"Watch HANGOVER feat. Snoop Dogg M/V @ http://youtu.be/HkMNOlYcpHg PSY - Gangnam Style (강남스타일) ▷ Available on iTunes: http://Smarturl.it/psygangnam ▷ Offici...","category":"Music","duration":"253","favoriteCount":"0","viewCount":"2086455425","author":"officialpsy","keyword":null,"uid":"20969683"}</span></div><div class="videoList" id="yyDUC1LUXSU" onclick="playvideo(this)"><img id="yyDUC1LUXSU" src="http://i.ytimg.com/vi/yyDUC1LUXSU/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">Robin Thicke - Blurred Lines ft. T.I., Pharrell</div><div><span class="published">2013-03-20 22:15:19</span><span class="author">RobinThickeVEVO</span></div><span class="duration">272</span><div class="viewCount">339556575</div></div><span class="jsondata">{"id":"yyDUC1LUXSU","title":"Robin Thicke - Blurred Lines ft. T.I., Pharrell","published":"2013-03-20 22:15:19","content":"Watch the UNRATED version only on VEVO: http://vevo.ly/W0OCcA Download the album in US now! http://smarturl.it/BlurredAlbum Click here for a special customiz...","category":"Music","duration":"272","favoriteCount":"0","viewCount":"339556575","author":"RobinThickeVEVO","keyword":null,"uid":"116730834"}</span></div><div class="videoList" id="hiP14ED28CA" onclick="playvideo(this)"><img id="hiP14ED28CA" src="http://i.ytimg.com/vi/hiP14ED28CA/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">Jason Derulo - "Wiggle" feat. Snoop Dogg (Official HD Music Video)</div><div><span class="published">2014-05-21 22:03:26</span><span class="author">Jason Derulo</span></div><span class="duration">224</span><div class="viewCount">262511114</div></div><span class="jsondata">{"id":"hiP14ED28CA","title":"Jason Derulo - \"Wiggle\" feat. Snoop Dogg (Official HD Music Video)","published":"2014-05-21 22:03:26","content":"Official HD Music Video for \"Wiggle\" featuring Snoop Dogg - Directed by Colin Tilley Jason Derulo's new Album 'Talk Dirty' is now available In Stores &amp; on iT...","category":"Music","duration":"224","favoriteCount":"0","viewCount":"262511114","author":"Jason Derulo","keyword":null,"uid":"164479649"}</span></div><div class="videoList" id="EHkozMIXZ8w" onclick="playvideo(this)"><img id="EHkozMIXZ8w" src="http://i.ytimg.com/vi/EHkozMIXZ8w/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">Eminem - The Monster (Explicit) ft. Rihanna</div><div><span class="published">2013-12-17 00:50:00</span><span class="author">EminemVEVO</span></div><span class="duration">319</span><div class="viewCount">213567876</div></div><span class="jsondata">{"id":"EHkozMIXZ8w","title":"Eminem - The Monster (Explicit) ft. Rihanna","published":"2013-12-17 00:50:00","content":"Download Eminem's 'MMLP2' Album on iTunes now:http://smarturl.it/MMLP2 Music video by Eminem ft. Rihanna \"The Monster\" © 2013 Interscope.","category":"Music","duration":"319","favoriteCount":"0","viewCount":"213567876","author":"EminemVEVO","keyword":null,"uid":"161107229"}</span></div><div class="videoList" id="BGa3AqeqRy0" onclick="playvideo(this)"><img id="BGa3AqeqRy0" src="http://i.ytimg.com/vi/BGa3AqeqRy0/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">"Color Songs Collection Vol. 1" - Learn Colors, Teach Colours, Baby Toddler Preschool Nursery Rhymes</div><div><span class="published">2013-11-02 22:25:54</span><span class="author">Busy Beavers</span></div><span class="duration">2001</span><div class="viewCount">200086453</div></div><span class="jsondata">{"id":"BGa3AqeqRy0","title":"\"Color Songs Collection Vol. 1\" - Learn Colors, Teach Colours, Baby Toddler Preschool Nursery Rhymes","published":"2013-11-02 22:25:54","content":"This Long-Play 33 Minute Video Teaches Children the Color Names with Catchy Song Melodies, Chants and Lessons starring our Famous Cute Characters and Colorfu...","category":"Education","duration":"2001","favoriteCount":"0","viewCount":"200086453","author":"Busy Beavers","keyword":null,"uid":"124761554"}</span></div><div class="videoList" id="tDq3fNew1rU" onclick="playvideo(this)"><img id="tDq3fNew1rU" src="http://i.ytimg.com/vi/tDq3fNew1rU/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">Sean Paul - Got 2 Luv U Ft. Alexis Jordan [Official Music Video]</div><div><span class="published">2011-09-15 22:38:02</span><span class="author">Atlantic Records</span></div><span class="duration">214</span><div class="viewCount">153968528</div></div><span class="jsondata">{"id":"tDq3fNew1rU","title":"Sean Paul - Got 2 Luv U Ft. Alexis Jordan [Official Music Video]","published":"2011-09-15 22:38:02","content":"Sean Paul's \"Got 2 Luv U\" video was shot at the Hard Rock Hotel in Las Vegas, and was directed by Ben Mor. Buy the single here: http://atlr.ec/omcYHc Watch m...","category":"Music","duration":"214","favoriteCount":"0","viewCount":"153968528","author":"Atlantic Records","keyword":null,"uid":"181687439"}</span></div><div class="videoList" id="SgM3r8xKfGE" onclick="playvideo(this)"><img id="SgM3r8xKfGE" src="http://i.ytimg.com/vi/SgM3r8xKfGE/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">Flo Rida - Club Can't Handle Me ft. David Guetta [Official Music Video] - Step Up 3D</div><div><span class="published">2010-07-15 21:30:55</span><span class="author">officialflo</span></div><span class="duration">246</span><div class="viewCount">148041548</div></div><span class="jsondata">{"id":"SgM3r8xKfGE","title":"Flo Rida - Club Can't Handle Me ft. David Guetta [Official Music Video] - Step Up 3D","published":"2010-07-15 21:30:55","content":"Off the new album ONLY ONE FLO (PART 1) - available everywhere NOW! Download the album on iTunes at http://atlr.ec/ftImIE and at Flo's Online Store at http:/...","category":"Music","duration":"246","favoriteCount":"0","viewCount":"148041548","author":"officialflo","keyword":null,"uid":"40649114"}</span></div><div class="videoList" id="RubBzkZzpUA" onclick="playvideo(this)"><img id="RubBzkZzpUA" src="http://i.ytimg.com/vi/RubBzkZzpUA/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">Drake - Started From The Bottom (Explicit)</div><div><span class="published">2013-02-13 16:40:14</span><span class="author">DrakeVEVO</span></div><span class="duration">321</span><div class="viewCount">132995293</div></div><span class="jsondata">{"id":"RubBzkZzpUA","title":"Drake - Started From The Bottom (Explicit)","published":"2013-02-13 16:40:14","content":"Music video by Drake performing Started From The Bottom (Explicit). ©: 2013 Cash Money Records.","category":"Music","duration":"321","favoriteCount":"0","viewCount":"132995293","author":"DrakeVEVO","keyword":null,"uid":"71528554"}</span></div><div class="videoList" id="I7HahVwYpwo" onclick="playvideo(this)"><img id="I7HahVwYpwo" src="http://i.ytimg.com/vi/I7HahVwYpwo/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">The Black Eyed Peas - Meet Me Halfway</div><div><span class="published">2010-01-21 18:04:20</span><span class="author">BlackEyedPeasVEVO</span></div><span class="duration">289</span><div class="viewCount">128470913</div></div><span class="jsondata">{"id":"I7HahVwYpwo","title":"The Black Eyed Peas - Meet Me Halfway","published":"2010-01-21 18:04:20","content":"Music video by Black Eyed Peas performing Meet Me Halfway. YouTube view counts pre-VEVO: 3094999. (C) 2009 Interscope Records #VEVOCertified on Dec. 5, 201...","category":"Music","duration":"289","favoriteCount":"0","viewCount":"128470913","author":"BlackEyedPeasVEVO","keyword":null,"uid":"40649202"}</span></div><div class="videoList" id="pt8VYOfr8To" onclick="playvideo(this)"><img id="pt8VYOfr8To" src="http:/i.ytimg.com/vi/pt8VYOfr8To/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">Britney Spears - Work B**ch</div><div><span class="published">2013-10-02 01:40:00</span><span class="author">BritneySpearsVEVO</span></div><span class="duration">235</span><div class="viewCount">125388829</div></div><span class="jsondata">{"id":"pt8VYOfr8To","title":"Britney Spears - Work B**ch","published":"2013-10-02 01:40:00","content":"From the album \"Britney Jean\". Download now on iTunes: http://smarturl.it/britneyjean?Iqid=yt Black Dog Films/Little Minx Director: Ben Mor Executive Produce...","category":"Music","duration":"235","favoriteCount":"0","viewCount":"125388829","author":"BritneySpearsVEVO","keyword":null,"uid":"192422107"}</span></div><div class="videoList" id="EmZvOhHF85I" onclick="playvideo(this)"><img id="EmZvOhHF85I" src="http://i.ytimg.com/vi/EmZvOhHF85I/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">Nicki Minaj - Beez In The Trap (Explicit) ft. 2 Chainz</div><div><span class="published">2012-04-07 04:00:06</span><span class="author">NickiMinajAtVEVO</span></div><span class="duration">281</span><div class="viewCount">122447956</div></div><span class="jsondata">{"id":"EmZvOhHF85I","title":"Nicki Minaj - Beez In The Trap (Explicit) ft. 2 Chainz","published":"2012-04-07 04:00:06","content":"Music video by Nicki Minaj performing Beez In The Trap (Explicit). © 2012 Cash Money Records/Young Money Ent./Universal Rec. Buy It Now! iTunes - http://bit....","category":"Music","duration":"281","favoriteCount":"0","viewCount":"122447956","author":"NickiMinajAtVEVO","keyword":null,"uid":"54968542"}</span></div><div class="videoList" id="791Dr-VH-Zw" onclick="playvideo(this)"><img id="791Dr-VH-Zw" src="http://i.ytimg.com/vi/791Dr-VH-Zw/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">FUNNY VIDEOS ACCIDENTS compilation 1 of 3 Video Serie</div><div><span class="published">2009-12-22 21:52:05</span><span class="author">MrTubegangsta</span></div><span class="duration">322</span><div class="viewCount">118711771</div></div><span class="jsondata">{"id":"791Dr-VH-Zw","title":"FUNNY VIDEOS ACCIDENTS compilation 1 of 3 Video Serie","published":"2009-12-22 21:52:05","content":"the saga continues. the legendary story oft the best funny movies. first movie: http://www.youtube.com/watch?v=Su7Wvr5QKL8 sekond movie: http://www.youtube.c...","category":"Comedy","duration":"322","favoriteCount":"0","viewCount":"118711771","author":"MrTubegangsta","keyword":null,"uid":"178198380"}</span></div><div class="videoList" id="ZXR-mBI5H6M" onclick="playvideo(this)"><img id="ZXR-mBI5H6M" src="http://i.ytimg.com/vi/ZXR-mBI5H6M/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">Bodybuilder Tamer El Shahat poses biceps</div><div><span class="published">2008-06-21 01:46:40</span><span class="author">tobydog22</span></div><span class="duration">67</span><div class="viewCount">114000995</div></div><span class="jsondata">{"id":"ZXR-mBI5H6M","title":"Bodybuilder Tamer El Shahat poses biceps","published":"2008-06-21 01:46:40","content":"Egyptian bodybuilder Tamer El Shahat poses biceps the day after a Musclemania competition in California several years ago. An excerpt from the DVD - Guns Mid...","category":"Sports","duration":"67","favoriteCount":"0","viewCount":"114000995","author":"tobydog22","keyword":null,"uid":"171579756"}</span></div><div class="videoList" id="uwiNDlxDdHs" onclick="playvideo(this)"><img id="uwiNDlxDdHs" src="http://i.ytimg.com/vi/uwiNDlxDdHs/mqdefault.jpg" onerror="imgError(this)"><div class="info"><div class="title">SPA 2</div><div><span class="published">2007-04-30 17:50:34</span><span class="author">Matias Romano</span></div><span class="duration">287</span><div class="viewCount">102986206</div></div><span class="jsondata">{"id":"uwiNDlxDdHs","title":"SPA 2","published":"2007-04-30 17:50:34","content":"REALIZACION JAVIER ROMANO SPA.","category":"Travel","duration":"287","favoriteCount":"0","viewCount":"102986206","author":"Matias Romano""keyword":null,"uid":"140557226"}</span></div></div>
+<div type="relationVideo">
+</div>
+</div>
+
+
+
+
+
+
+</body> 

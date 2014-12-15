@@ -1,0 +1,102 @@
+<!DOCTYPE>
+<html>
+<head>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js"/>
+<script>
+/*function submit() {
+		$("#info").submit();
+		url = 'http://140.123.101.183:5182/~tan/data/youtube/manage.php';
+		req = false;
+		if(window.XMLHttpRequest) {
+				try { req = new XMLHttpRequest();
+				} catch(e) {
+						req = false; }
+		} else if(window.ActiveXObject) {
+				try { req = new ActiveXObject("Msxml2.XMLHTTP");
+				} catch(e) {
+						try { req = new ActiveXObject("Microsoft.XMLHTTP");
+						} catch(e) { req = false; }
+				}
+		}
+		if(req) {
+				req.onreadystatechange = processReqChange;
+				req.open("POST", url, true);
+				req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				start = new Date().getTime();
+				method = "mysql";
+				//              method = "mongo";
+				req.send("search="+$("#search").val()+"&order="+$("#order").val()+"&method="+method);
+				$("#videoPlay").html("");
+				$("#relationVideo").html("");
+		}
+		return true;
+}
+function processReqChange(){
+		if(req.readyState==4){
+				end = new Date().getTime();
+				tmp = req.responseText;
+				try {
+						obj = JSON.parse(tmp);
+				}
+				catch (e) {
+						console.log(tmp);
+						return false;
+				}
+				parseJsonToList();
+		}
+}*/
+</script>
+</head>
+<body>
+<form method="post" name="info" id="info" action="manage.php">
+<select name="type" id="type">
+<option value="insert" selected="selected">insert</option>
+<option value="update">update</option>
+<option value="delete">delete</option>
+</select>
+<input type="text" id="id" name="id" placeholder="id"></input><br/>
+<input type="text" id="title" name="title" placeholder="title"></input><br/>
+<input type="text" id="published" name="published" placeholder="published"></input><br/>
+<input type="text" id="content" name="content" placeholder="content"></input><br/>
+<input type="text" id="category" name="category" placeholder="category"></input><br/>
+<input type="text" id="duration" name="duration" placeholder="duration"></input><br/>
+<input type="text" id="favoriteCount" name="favoriteCount" placeholder="favoriteCount"></input><br/>
+<input type="text" id="viewCount" name="viewCount" placeholder="viewCount"></input><br/>
+<input type="text" id="author" name="author" placeholder="author"></input><br/>
+<input type="text" id="keyword" name="keyword" placeholder="keyword"></input><br/>
+<input type="text" id="uid" name="uid" placeholder="uid"></input><br/>
+<input type="button" onClick="submit()" value="search"/>
+</form>
+
+<script>
+$("#type").change(function(){
+//		$("input").attr('disabled','disabled');
+		str = '';
+		if($(this).val()=='insert'){
+		$("#info input").attr('disabled',false);
+		}
+		else if($(this).val() == 'update'){
+		$("#id").attr('disabled',false);
+		$("#title").attr('disabled',false);
+		$("#published").attr('disabled',true);
+		$("#content").attr('disabled',false);
+		$("#category").attr('disabled',false);
+		$("#duration").attr('disabled',false);
+		$("#favoriteCount").attr('disabled',true);
+		$("#viewCount").attr('disabled',true);
+		$("#author").attr('disabled',false);
+		$("#keyword").attr('disabled',false);
+		$("#uid").attr('disabled',true);
+		}
+		else{
+		$("#info input").attr('disabled',true);
+		$("#id").attr('disabled',false);
+		}
+		$("#id").val(str);
+}
+).change;
+</script>
+
+
+</body>
+</html>

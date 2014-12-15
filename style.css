@@ -1,0 +1,110 @@
+.topbar{
+position:fixed;
+background-color:#F1FF3F;
+top:0;
+left:0;
+right:0;
+z-index: 1;
+height:40px;
+}
+.searchBox{
+position:relative;
+left:50%;
+padding-top:5px;
+margin-left:-250px;
+margin-bottom:50px;
+//width:100%;
+//display:block;
+}
+.pageContainer{
+position:relative;
+width:100%;
+top:50px;
+}
+.video{
+}
+.relationVideo{
+position:relative;
+float:right;
+width:35%;
+}
+
+.videoList{
+position:relative;
+left:50%;
+margin-left:-350px;
+height:150px;
+//width:30em;
+width:550px;
+	  background-color:#CC66FF;
+}
+.videoList:hover{
+background-color:#EFEFB6;
+transition:1s;
+}
+.relationVideo .videoList{
+position:relative;
+left:auto;
+margin-left:auto;
+height:100px;
+width:100%;
+//height:150px;
+}
+.videoList img{
+float:left;
+//height:100px;
+//width:150px;
+height:100%;
+width:30%;
+}
+.videoList .info{
+//float:left;
+width:67%;
+}
+.jsondata{
+visibility: hidden;
+}
+.videoPlay {
+position:relative;
+width:60%;
+float:left;
+}
+.videoPlay *{
+//width:60%;
+padding-top:0.2em;
+padding-bottom:0.2em;
+clear:left;
+clear:right;
+}
+.videoPlay .title{
+		font-size:1.3em;
+font-weight: bolder;
+}
+.videoPlay .author{
+font-weight: bold;
+font-size:1.1em;
+}
+.videoPlay .infoRow {
+}
+.videoPlay .viewCount{
+position:relative;
+width:auto;
+float:left;
+}
+.videoPlay .favoriteCount{
+position:relative;
+width:auto;
+float:right;
+}
+.videoPlay .content{
+margin-top:1.5em;
+margin-bottom:1.5em;
+background-color:#456789;
+clear:left;
+clear:right;
+}
+.videoPlay table{
+width:30%;
+}
+
+

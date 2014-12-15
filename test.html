@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js">
+</script>
+<script>function getData() {		url = 'http://140.123.101.183:5182/~tan/data/youtube/search.php';
+/*		tmp = document.getElementById('keyword').value;
+		if(tmp == ''){				alert('no input in text box');
+		}		url += "?"+"keyword="+tmp;
+*/		req = false;
+		if(window.XMLHttpRequest) {				try { req = new XMLHttpRequest();
+				} catch(e) {						req = false;
+ }		} else if(window.ActiveXObject) {				try { req = new ActiveXObject("Msxml2.XMLHTTP");
+				} catch(e) {						try { req = new ActiveXObject("Microsoft.XMLHTTP");
+						} catch(e) { req = false;
+ } 				} 		}		if(req) { //				document.getElementById("dataTable").innerHTML = 'loading data';
+				req.onreadystatechange = processReqChange;
+				req.open("POST", url, true);
+				req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				req.send("search="+$("#search").val());
+//				$("#video").html("search="+$("#search").val());
+		}		return true;
+}function processReqChange(){		if(req.readyState==4){				tmp = req.responseText;
+				$("#video").html(tmp);
+				obj = JSON.parse(tmp);
+				console.log(obj);
+				parseJsonToList();
+		}}function parseJsonToList(){		var innerstring='';
+		for(var i = 0;
+ i < obj.length;
+ i++) {				tmp = obj[i];
+				innerstring+='<div class="videoList" id="'+obj[i].id+'" onclick="playvideo(this)"><img id="';
+				innerstring+=obj[i].id+'"src="http://i.ytimg.com/vi/'+obj[i].id;
+				innerstring+='/mqdefault.jpg" onerror="imgError(this)"/><div class="info"><div class="title">';
+				innerstring+=obj[i].title+'</div><div><span class="published">'+obj[i].published;
+				innerstring+='</span><span class="author">'+obj[i].author+'</span></div><span class="duration">';
+				innerstring+=obj[i].duration+'</span><div class="viewCount">'+obj[i].viewCount;
+				innerstring+='</div></div>';
+				innerstring+='<span class="jsondata">'+JSON.stringify(obj[i])+'</span></div>';
+		}		$("#video").html(innerstring);
+		//console.log("###!"+$("#"+obj[0].id+" .jsondata").text());
+}function playvideo(video){		tmp = video.getElementsByClassName('jsondata')[0].innerHTML;
+		$("#video").html(tmp);
+}function imgError(image) {		image.onerror = "";
+		image.src = "http://i.ytimg.com/vi_webp/"+image.id+"/default.webp";
+		return true;
+}</script></head>
+<body>
+<div class="topbar">	
+<div class="searchBox">		
+<form method="post" name="info" action="/youtube/search.php">		
+<input type="text" id="search" name="search" placeholder="search">
+</input>		
+<input type="button" onclick="getData()" value="search">		order by:
+<select name="orderBy"> 		
+<option value="viewCount" selected="selected">view count
+</option>		
+<option value="published"> creation time
+</option>		
+<option value="duration">video length
+</option>		
+</select>		
+</form>	
+</div>
+</div>
+<div class="pageContainer">	
+	<div class="video" id="video">
+	</div>
+	<div class="videoPlay">
+		<iframe width="800" height="448" src="//www.youtube.com/embed/7-7knsP2n5w" frameborder="0" allowfullscreen></iframe>
+		<iframe width="800" height="600" src="//www.youtube.com/embed/yyDUC1LUXSU" frameborder="0" allowfullscreen=""></iframe>
+		<div class="title">
+		</div>
+		<div class="author">Author : </div>
+		<div class="infoRow">
+			<div class="viewCount">views : </div>
+
+			<div  class="favoriteCount">likes : </div>
+		</div>
+		<div class="content">
+		</div>
+		<table class="infoTable">
+			<tr>
+				<td>published</td><td></td>
+			</tr>
+			<tr>
+				<td>category</td><td></td>
+			</tr>
+		</table>
+	</div>	
+	<div class="relationVideo">
+	</div>
+</div>
+</body>
+</html>
+

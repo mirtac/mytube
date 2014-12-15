@@ -1,0 +1,77 @@
+create table record (id varchar(20) NOT NULL UNIQUE,title varchar(500),published timestamp default current_timestamp,content varchar(500),category varchar(30),duration INT,favoriteCount INT,viewCount INT,author varchar(500),keyword varchar(50),uid INT);
+
+
+
+mysql --local-infile=1
+load data local infile "/data/mysql.rec" into table record fields terminated by '\t' lines terminated by '\n';
+
+select * from record where category="264";
+
+
+
+load data local infile "/home/tan/convert/mysql.rec" into table test fields terminated by '\t' lines terminated by '\n';
+
+
+mysql --local-infile=1 --show-warnings  youtubeDB -e "show ;" >> /home/mysql/output 2>&1
+
+
+mysql --local-infile=1 --show-warnings --max_error_count=20000000  youtubeDB -e "load data local infile \"/data/mysql.rec\" into table record fields terminated by '\t' lines terminated by '\n';" >> /home/mysql/output 2>&1
+
+
+
+
+
+
+mongo
+db.record.find({$or:[{content:/.*video by M.*/},{title:/.*PSY.*/}]});
+
+
+
+
+
+
+struct Record{
+		char id[20];
+		char title[500];
+		char published[50];
+		char content[500];
+		char category[50];
+		char duration[30];
+		char favoriteCount;
+		char viewCount[30];
+		char author[100];
+		char keyword[50];
+		char uid[30];
+		int isAssign[11];
+};
+
+
+db.createUser(
+				{
+						user: "sa",
+						pwd: "tan",
+						roles:
+						[
+						{
+								role: "userAdminAnyDatabase",
+								db: "admin"
+						}
+						]
+				}
+			)
+
+
+
+db.createUser(
+				{
+						user: "test",
+						pwd: "testdb",
+						roles:
+							[
+							{
+									role: "dbOwner",
+									db: "test"
+							}
+							]
+				}
+			)
