@@ -81,15 +81,15 @@ function mysqlSearch(){
 		$db->close();
 }
 function mongoSearch(){
-		var $db = mongoConnect();
+		$db = mongoConnect();
 //		$collection = $db->test;
-		var $collection=$db->selectCollection("test");
+		$collection=$db->selectCollection("test");
 		//$collection=db->record;
-		var $searchphrase = $_POST['search'];
-		var $orderby = $_POST['order'];
-		var $limitCount=20;
+		$searchphrase = $_POST['search'];
+		$orderby = $_POST['order'];
+		$limitCount=20;
 
-		var $regex = new MongoRegex('/.*'.$searchphrase.'.*/i');
+		$regex = new MongoRegex('/.*'.$searchphrase.'.*/i');
 		$ops = array(
 						array(
 								'$match' => array( 
@@ -115,6 +115,8 @@ function mongoSearch(){
 				break;
 		}*/
 		echo json_encode($result['result']);
+//		var_dump($result);
+//		echo count($result['result']);
 		return;	
 
 /**/

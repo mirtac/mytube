@@ -106,5 +106,7 @@ clear:right;
 .videoPlay table{
 width:30%;
 }
-
-
+/*signin.php*/
+.signin{
+		        text-align:center;
+}

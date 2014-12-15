@@ -32,12 +32,19 @@ function mongoConnect(){
 		    $record = $c_record->find();
 		    return $db;
 }
+$op = array(
+	);
+$user='{"a":"ha","b":"hb","c":["A","B","C",{"IN":"t"}]}';
+$userV = json_decode($user);
+var_dump($userV);
+echo "<br/>";
+var_dump($op);
 ?>
 <?php
 
 //phpinfo();
 //$dbhost="140.123.101.185";
-$newline="<br/>";
+/*$newline="<br/>";
 $json   = '[
 {
 		"source":"symbols/2/2.png",
@@ -75,9 +82,9 @@ $json   = '[
 		"template":"8B82CA47-41D2-D624-D6A2-37177CD82F28"
 }
 ]';
-
+*/
 //$db = mongoConnect();
-$db = mysqlConnect();
+//$db = mysqlConnect();
 //$my_arr = json_decode($json, true);
 //var_dump($my_arr);
 //echo $newline;
@@ -94,15 +101,15 @@ echo "INSERT INTO `table` SET $sqlclause";
 }
 */
 /*mysql test select*/
-$sth = mysqli_query($db,"SELECT * from test");
-$rows = array();
-while($r = mysqli_fetch_assoc($sth)) {
-		    $rows[] = $r;
-}
-print json_encode($rows);
+//$sth = mysqli_query($db,"SELECT * from test");
+//$rows = array();
+//while($r = mysqli_fetch_assoc($sth)) {
+//		    $rows[] = $r;
+//}
+//print json_encode($rows);
 
 /**/
-$videoID='7-7knsP2n5w';
+//$videoID='7-7knsP2n5w';
 //echo '<iframe width="560" height="315" src="//www.youtube.com/embed/'.$videoID.'" frameborder="0" allowfullscreen></iframe>';
 //echo '<br/>execute #END#;<br/>';
 

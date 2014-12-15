@@ -91,6 +91,9 @@ function parseJsonToList(){
 				innerstring+='</div></div>';
 				innerstring+='<span class="jsondata">'+JSON.stringify(obj[i])+'</span></div>';
 		}
+		if(obj.length==0){
+				innerstring='<div style="text-align:center"><h2>no result</h2></div>';
+		}
 		$("#video").html(innerstring);
 		//console.log("###!"+$("#"+obj[0].id+" .jsondata").text());
 
