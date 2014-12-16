@@ -8,16 +8,17 @@
 <script>
 var start = 0;
 var end = 0;
-var method="mysql";
-//method = "mysql";
-				method = "mongo";
+var db="mysql";
+var obj;
+//db = "mysql";
+				db = "mongo";
 function change(){
-		if(method=="mysql")method="mongo";
-		else	method="mysql";
+		if(db=="mysql")db="mongo";
+		else	db="mysql";
 }
-function getData() {
+function getData(method,id) {
 		//url = 'http://140.123.101.185:5182/~tan/data/youtube/search.php';
-		url = './search.php';
+		//url = 'search.php';
 		req = false;
 		if(window.XMLHttpRequest) {
 				try { req = new XMLHttpRequest();
@@ -30,19 +31,33 @@ function getData() {
 						} catch(e) { req = false; } 
 				} 
 		}
-		if(req) { 
-				req.onreadystatechange = processReqChange;
-				$("#message").html('searching...');
+		if(req) {
+				if(method=='search'){
+						url = 'search.php';
+						req.onreadystatechange = processSearchReqChange;
+						$("#message").html('searching...');
+						parameter="search="+$("#search").val()+"&order="+$("#order").val()+"&method="+db;
+						$("#videoPlay").html("");
+						$("#relationVideo").html("");
+						start = new Date().getTime();
+				}
+				else if(method=='comment'){
+						url = 'handle.php';
+						req.onreadystatechange = processCommentReqChange;
+						parameter="type=comment&vid="+id;
+						if($("#comment").val() ==''){
+						}
+						else{
+								parameter+="&message="+$("#comment").val();
+						}
+				}
 				req.open("POST", url, true);
 				req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-				start = new Date().getTime();
-				req.send("search="+$("#search").val()+"&order="+$("#order").val()+"&method="+method);
-				$("#videoPlay").html("");
-				$("#relationVideo").html("");
+				req.send(parameter);
 		}
 		return true;
 }
-function processReqChange(){
+function processSearchReqChange(){
 		if(req.readyState==4){
 				end = new Date().getTime();
 				tmp = req.responseText;
@@ -58,6 +73,29 @@ function processReqChange(){
 				}
 //				console.log(obj);
 				parseJsonToList();
+		}
+}
+function processCommentReqChange(){
+		if(req.readyState==4){
+				commentHtmlCode='';
+				tmp = req.responseText;
+				console.log(tmp);
+				try{
+						obj = JSON.parse(tmp);
+				}catch (e){
+						console.log('fail on processCommentReqChange');
+						return false;
+				}
+				for(var i = 0; i < obj.length; i++) {
+						commentHtmlCode+='<div class="comment"><div class="date">'+obj[i].time; 
+						commentHtmlCode+='</div><div class="name">'+obj[i].name+'</div>';
+						commentHtmlCode+='<div class="content">'+obj[i].content+'</div>';
+
+				}
+
+
+				$("#commentList").html(commentHtmlCode);
+				console.log(commentHtmlCode);
 		}
 }
 function parseJsonToList(){
@@ -113,9 +151,13 @@ function playvideo(video){
 		htmlcode+='likes : '+videoJson.favoriteCount+'</div></div><div class="content">';
 		htmlcode+=videoJson.content+'</div><table class="infoTable"><tr><td>published</td><td>';
 		htmlcode+=videoJson.published+'</td></tr><tr><td>category</td><td>'+videoJson.category+'</td></tr></table>';
+
+		htmlcode+='<input type="text" id="comment" name="comment" placeholder="comment"></input>';
+		htmlcode+='<input type="button" onClick="getData(\'comment\',\''+videoJson.id+'\')" value="comment"/>';
 		if($("#relationVideo").html() == "" )$("#relationVideo").html($("#video").html());
 		$("#video").html('');
 		$("#videoPlay").html(htmlcode);
+		getData('comment',videoJson.id);
 		return;
 }
 function imgError(image) {
@@ -131,7 +173,7 @@ function imgError(image) {
 	<div class="searchBox">
 		<form method="post" name="info">
 		<input type="text" id="search" name="search" placeholder="search"></input>
-		<input type="button" onClick="getData()" value="search"/>
+		<input type="button" onClick="getData('search')" value="search"/>
 		order by:<select name="orderBy" id="order"> 
 		<option value="" selected="selected">none</option>
 		<option value="viewCount" >view count</option>
@@ -148,6 +190,8 @@ function imgError(image) {
 	<div class="videoPlay" id="videoPlay">
 	</div>
 	<div class="relationVideo" id="relationVideo"></div>
+	<div class="commentList" id="commentList">
+	</div>
 </div>
 </body>
 

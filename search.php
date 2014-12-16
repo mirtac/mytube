@@ -115,7 +115,13 @@ function mongoSearch(){
 				break;
 		}*/
 		echo json_encode($result['result']);
-//		var_dump($result);
+		//echo $result['result'][0]['_id']->{'$id'};
+		//$a="";
+		//$a=$result['result'][0]['_id'];
+		//echo date('Y-m-d',$a->getTimestamp());
+		//var_dump($a);
+//		var_dump($result['result'][0]['_id']);
+		//var_dump($result);
 //		echo count($result['result']);
 		return;	
 
