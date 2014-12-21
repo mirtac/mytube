@@ -190,7 +190,7 @@ function imgError(image) {
 		return true;
 }
 function setUserInfo(){
-		name = '<?php echo $name;?>';
+		name = '<?php echo $name.'  <a href="./handle.php?type=logout">logout</a>';?>';
 		signin='';
 		if(name=='guest'){
 				signin='    <a href="signin.php">SIGN IN?</a>';

@@ -38,8 +38,8 @@ function mongoConnect(){
 <body>
 <?php
 */
+$videoDB = 'test';
 if(count($_POST)>0){
-
 		//if(!strcmp($_POST["type"],"create")){
 		if($type=='create'){
 				$account= $_POST['account'];
@@ -72,6 +72,7 @@ if(count($_POST)>0){
 				echo '<script>document.location.href="./signin.php"</script>';
 		}
 		elseif ($type=='signin'){
+				var_dump($_POST);
 				//extract( $_POST );
 				$account= $_POST['account'];
 				$passwd = $_POST['passwd'];
@@ -84,89 +85,80 @@ if(count($_POST)>0){
 
 
 				$result = $collection->findOne($loginQuery);
-				if($result!=null){
-//						var_dump( $result  );
+				if($result!=null){//login successful
 						$_SESSION["uid"]=$result['_id'];
 						$_SESSION["account"]=$result['account'];
 						$_SESSION["passwd"]=$result['passwd'];
 						$_SESSION["email"]=$result['email'];
 						$_SESSION["name"]=$result['name'];
 						
-						/*logout!*/
-
-						/*var_dump($_SESSION);
-						echo '<br/>';
-						foreach ($_SESSION as $i => $value) {
-								    unset($_SESSION[$i]);
-						}
-						var_dump($_SESSION);
-						echo '['.$_SESSION['uid'].']';*/
-						/*logout!*/
 						echo '<script>document.location.href="./display.php"</script>';
 				}
-				else {
+				else {//TODO error account or passwd;
 //				echo "'$account' have not been registered    <a href='./create_account.php'>CREATE IT?</a><br/>";
 						echo 'login fail!! <a href="signin.php">SIGNIN</a>';
 				}
 				return;
-
-
-				$link = mysql_connect('localhost', 's499410039','sql321'); 
-				if(!$link) { 
-						die('Could not connect: ' . mysql_error()); 
-				} 
-				mysql_select_db("s499410039", $link);
-
-
-				$queryString="select * from account where (name='$name'&&password='$passwd')";
-				//				echo $queryString;
-				$result = mysql_query($queryString);
-				$row = mysql_fetch_array($result);
-				if(count($row) >1 ){//get data
-						//set session
-						session_register("uid");
-						session_register("account");
-						session_register("passwd");
-						session_register("email");
-						$_SESSION["uid"]=$row['aid'];
-						$_SESSION["account"]=$row['account'];
-						$_SESSION["passwd"]=$row['password'];
-						$_SESSION["email"]=$row['email'];
-						
-						//set cookie
-//						setcookie("name",$name,time()+3600);
-						echo '<script>document.location.href="./wall.php"</script>';
-				}
-				else{//error account or passwd;
-						$queryString="select * from account where name='$name'";
-						//				echo $queryString;
-						$result = mysql_query($queryString);
-						//echo $queryString;
-						$row = mysql_fetch_array($result);
-						if(count($row) >1 ){//get data
-								echo '<script>document.location.href="./error.php?errno=3"</script>';
-						}
-						else{
-								echo "'$account' have not been registered    <a href='./create_account.php'>CREATE IT?</a><br/>";
-								echo 'or come back to <a href="signin.php">SIGNIN</a>';
-						}
-				}
-
-
 		}
 		elseif($type=='logout'){//session_unset();or: unset($_SESSION["XXX"]);
-				session_unset();
-				session_destroy();
-				echo $_SESSION["account"].'logout<br>';
+				/*logout!*/
+
+				var_dump($_SESSION);
+				echo '<br/>';
+				foreach ($_SESSION as $i => $value) {
+						unset($_SESSION[$i]);
+				}
+				var_dump($_SESSION);
+				echo '['.$_SESSION['uid'].']';
+				/*logout!*/
+				
+			/*	echo $_SESSION["account"].'logout<br>';
 				echo 'turn to sign in 1 sec<br>';
 				echo '<script>setTimeout(function() { document.location.href="./signin.php";}, 1000);</script>';
+			*/
 
+		}
+		if($type=='insert'){//TODO
+				$id= $_POST['id'];
+				$title = $_POST[''];
+				$published = $_POST[''];
+				$content = $_POST[''];
+				$category = $_POST[''];
+				$duration = $_POST[''];
+				$favoriteCOunt = $_POST[''];
+				$viewCount = $_POST[''];
+				$author = $_POST[''];
+				$keyword = $_POST[''];
+				$uid = $_POST[''];
+				$tag = 'tag';
+				$dislike= 'dislike';
+				$db = mongoConnect();
+				$collection=$db->selectCollection("$videoDB");
+				$result = $collection->find(array('id' => $id))->count();
+
+
+				if($result!=0){//alert already have the same account;
+						echo '<script>document.location.href="./error.php?errno=1"</script>';
+				}
+				else{
+						$doc = [ "account" => $account , "email" => $email , "passwd" => $passwd , 'name' => $name];
+						$collection->insert($doc);
+						echo 'successful';
+				}
+
+				$query = "INSERT INTO $table (id,title ,published,content,category,duration,favoriteCount,viewCount,author,keyword,uid) VALUES ('$id','$title',$published,'$content',$duration,$favoriteCount,$viewCount,'$author','$keyword',$uid )";
+		}
+		elseif($type=='update'){//TODO
+				$query = "UPDATE $table SET title='$title',content='$content',category='$category',duration=$duration,author='$author',keyword='$keyword' WHERE id=$id";
+		}
+		elseif($type=='delete'){
+				//TODO
 		}
 		elseif ($type=='post'){
 				$textpost=str_replace ("\r\n","<br/>",$textpost);
 				$link = mysql_connect('localhost', 's499410039','sql321'); 
 				if(!$link) { 
-						die('Could not connect: ' . mysql_error()); 
+						die('Could not connect(339): ' . mysql_error()); 
 				} 
 				mysql_select_db("s499410039", $link);
 
@@ -216,7 +208,7 @@ if(count($_POST)>0){
 				$textpost=str_replace ("\r\n","<br/>",$textpost);
 				$link = mysql_connect('localhost', 's499410039','sql321'); 
 				if(!$link) { 
-						die('Could not connect: ' . mysql_error()); 
+						die('Could not connect(323): ' . mysql_error()); 
 				} 
 				mysql_select_db("s499410039", $link);
 
@@ -249,7 +241,7 @@ elseif (count($_GET>0)){
 		if ($type=='mlike'){
 				$link = mysql_connect('localhost', 's499410039','sql321'); 
 				if(!$link) { 
-						die('Could not connect: ' . mysql_error()); 
+						die('Could not connect(112): ' . mysql_error()); 
 				} 
 				mysql_select_db("s499410039", $link);
 
@@ -272,7 +264,7 @@ elseif (count($_GET>0)){
 		elseif ($type=='clike'){
 				$link = mysql_connect('localhost', 's499410039','sql321'); 
 				if(!$link) { 
-						die('Could not connect: ' . mysql_error()); 
+						die('Could not connect: (51)' . mysql_error()); 
 				} 
 				mysql_select_db("s499410039", $link);
 
@@ -290,7 +282,26 @@ elseif (count($_GET>0)){
 						//echo $queryString;
 						$result = mysql_query($queryString);
 				}
+		}		
+		elseif($type=='logout'){//TODO dup logout
+				/*logout!*/
+
+				var_dump($_SESSION);
+				echo '<br/>';
+				foreach ($_SESSION as $i => $value) {
+						unset($_SESSION[$i]);
+				}
+				var_dump($_SESSION);
+				echo '['.$_SESSION['uid'].']';
+				/*logout!*/
+				
+			/*	echo $_SESSION["account"].'logout<br>';
+				echo 'turn to sign in 1 sec<br>';
+				echo '<script>setTimeout(function() { document.location.href="./signin.php";}, 1000);</script>';
+			*/
+
 		}
+
 		echo '<script>document.location.href="./wall.php"</script>';
 }
 else{
