@@ -1,3 +1,12 @@
+<?php
+session_start();
+if(isSet($_SESSION["uid"])){
+		$name = $_SESSION['name'];
+}
+else{
+		$name = 'guest';
+}
+?>
 <!DOCTYPE html>
 <html>
 
@@ -51,6 +60,17 @@ function getData(method,id) {
 								parameter+="&message="+$("#comment").val();
 						}
 				}
+				else if(method=='test'){
+						url = 'handle.php';
+						req.onreadystatechange = processTestReqChange;
+						parameter="type=comment&vid="+id;
+						if($("#comment").val() ==''){
+						}
+						else{
+								parameter+="&message="+$("#comment").val();
+						}
+				}
+	
 				req.open("POST", url, true);
 				req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 				req.send(parameter);
@@ -75,6 +95,12 @@ function processSearchReqChange(){
 				parseJsonToList();
 		}
 }
+function processTestReqChange(){
+		if(req.readyState==4){
+				tmp = req.responseText;
+				console.log(tmp);
+		}
+}
 function processCommentReqChange(){
 		if(req.readyState==4){
 				commentHtmlCode='';
@@ -92,8 +118,6 @@ function processCommentReqChange(){
 						commentHtmlCode+='<div class="content">'+obj[i].content+'</div>';
 
 				}
-
-
 				$("#commentList").html(commentHtmlCode);
 				console.log(commentHtmlCode);
 		}
@@ -165,11 +189,25 @@ function imgError(image) {
 		image.src = "http://i.ytimg.com/vi_webp/"+image.id+"/default.webp";
 		return true;
 }
+function setUserInfo(){
+		name = '<?php echo $name;?>';
+		signin='';
+		if(name=='guest'){
+				signin='    <a href="signin.php">SIGN IN?</a>';
+		}
+		else{
+
+		}
+		$("#userinfo").html(name+signin);
+
+
+}
 </script>
 </head>
 <body>
 <div class="topbar">
 <span style="position:absolute;" id="message"></span>
+<span style="position:absolute;right:5%;z-index:5" id="userinfo"></span>
 	<div class="searchBox">
 		<form method="post" name="info">
 		<input type="text" id="search" name="search" placeholder="search"></input>
@@ -193,6 +231,9 @@ function imgError(image) {
 	<div class="commentList" id="commentList">
 	</div>
 </div>
+<script>
+setUserInfo();
+</script>
 </body>
 
 
