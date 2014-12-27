@@ -23,10 +23,6 @@ var db="mysql";
 var obj;
 //db = "mysql";
 				db = "mongo";
-function change(){
-		if(db=="mysql")db="mongo";
-		else	db="mysql";
-}
 function getData(method,id) {
 		//url = 'http://140.123.101.185:5182/~tan/data/youtube/search.php';
 		//url = 'search.php';
@@ -174,6 +170,7 @@ function playvideo(video){
 		$("#message").html(videoJson.title);
 		$("#message").css({"font-size":"1.1em","font-weight":"bolder"});
 		htmlcode='';
+		/*video*/
 		iframeWidth=Math.floor(($(window).width()*6/10)-5);
 		htmlcode='<iframe width="'+iframeWidth+'" height="'+Math.floor((iframeWidth*0.56));
 		htmlcode+='" src="//www.youtube.com/embed/'+videoJson.id;
@@ -183,7 +180,7 @@ function playvideo(video){
 		htmlcode+='likes : '+videoJson.favoriteCount+'</div></div><div class="content">';
 		htmlcode+=videoJson.content+'</div><table class="infoTable"><tr><td>published</td><td>';
 		htmlcode+=videoJson.published+'</td></tr><tr><td>category</td><td>'+videoJson.category+'</td></tr></table>';
-
+		/*comment post form*/
 		htmlcode+='<input type="text" id="comment" name="comment" placeholder="comment"></input>';
 		htmlcode+='<input type="button" onClick="getData(\'comment\',\''+videoJson.id+'\')" value="comment"/>';
 		if($("#relationVideo").html() == "" )$("#relationVideo").html($("#video").html());
@@ -227,7 +224,6 @@ function setUserInfo(){
 		<option VALUE="duration">video length</option>
 		</select>
 		</form>
-		<button onclick="change()" value="switch"/>
 	</div>
 </div>
 <div class="pageContainer">
