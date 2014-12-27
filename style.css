@@ -28,8 +28,19 @@ position:relative;
 float:right;
 width:35%;
 }
-
 .videoList{
+position: relative;
+float: left;
+height: 150px;
+width: 30%;
+background-color: #CC66FF;
+padding: 3px;
+margin: 5px;
+overflow: hidden;
+border: solid 3px #A7A7A8;
+}
+
+/*.videoList{
 position:relative;
 left:50%;
 margin-left:-350px;
@@ -37,7 +48,7 @@ height:150px;
 //width:30em;
 width:550px;
 	  background-color:#CC66FF;
-}
+}*/
 .videoList:hover{
 background-color:#EFEFB6;
 transition:1s;

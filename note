@@ -7,10 +7,15 @@ tags
 db.test.findOne({tag:{$in:["banana","haha"]}})
 db.test.update(  { _id: XXX }, { $addToSet: { tags: "accessories" } }   )
 db.lastTagDB.update({tags:"music"},{ $inc:{count:1}, $set:{ tags:"music"} },{upsert:true}    )
+
+search
+db.record.aggregate([{$match:{$and:{ {$text:{$search:"psy"}},{"category":"Music"} } }  },{$limit:5}])
 db.test.aggregate([{$match:{$text:{$search:"psy"}}}])
 db.record.aggregate([{$match:{$text:{$search:"psy"}}},{$limit:5}])
 db.record.aggregate([{$match:{$text:{$search:"psy"}}},{$sort:{favoriteCount:1}},{$limit:3}])
 
+
+index
 db.test.ensureIndex({"title":"text","content":"text","author":"text"})
 db.test.ensureIndex({"$**": "text"})
 
