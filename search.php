@@ -92,15 +92,10 @@ function mongoSearch(){
 		$regex = new MongoRegex('/.*'.$searchphrase.'.*/i');
 		$ops = array(
 						array(
-								'$match' => array( 
-										'$or' => array(
-												array(
-														'content' => $regex
-													 ),
-												array(
-														'title' =>   $regex 
-													 ) 
-												) 
+								'$match' => array(
+											'$text' => array(
+													'$search' => $searchphrase
+											)
 										)
 							 ),
 						array(

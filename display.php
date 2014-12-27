@@ -12,6 +12,8 @@ else{
 
 <head>
 <link rel="stylesheet" type="text/css" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js">
 </script>
 <script>
@@ -139,11 +141,17 @@ function parseJsonToList(){
 		var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
 		*/
 
+
 		var innerstring='';
 		//innerstring = "total searching time : "+ (end - start) + " ms <br/>";
 		$("#message").html("total searching time : "+ (end - start) + " ms");
 		for(var i = 0; i < obj.length; i++) {
-				tmp = obj[i];
+				/*date transfer*/
+				time = new Date(obj[i].published.sec * 1000000);
+				obj[i].published=time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
+				//obj[i].published=time;
+				
+				/**/
 				innerstring+='<div class="videoList" id="'+obj[i].id+'" onClick="playvideo(this)"><img id="'
 				innerstring+=obj[i].id+'"src="http://i.ytimg.com/vi/'+obj[i].id;
 				innerstring+='/mqdefault.jpg" onerror="imgError(this)"/><div class="info"><div class="title">';
