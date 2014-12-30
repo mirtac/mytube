@@ -32,11 +32,10 @@ width:35%;
 position: relative;
 float: left;
 height: 150px;
-width: 30%;
+width: 25%;
 background-color: #CC66FF;
 padding: 3px;
-margin: 5px;
-overflow: hidden;
+margin: 3%;
 border: solid 3px #A7A7A8;
 }
 
@@ -63,14 +62,15 @@ width:100%;
 }
 .videoList img{
 float:left;
-//height:100px;
-//width:150px;
 height:100%;
 width:30%;
 }
 .videoList .info{
-//float:left;
-width:67%;
+}
+.videoList .info *{
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
 }
 .jsondata{
 visibility: hidden;
@@ -117,7 +117,7 @@ clear:right;
 .videoPlay table{
 width:30%;
 }
-.commentList{
+.commentDiv{
 position:relative;
 width:60%;
 z-index: -1;
