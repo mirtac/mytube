@@ -83,7 +83,9 @@ function mysqlSearch(){
 function mongoSearch(){
 		$db = mongoConnect();
 //		$collection = $db->test;
-		$collection=$db->selectCollection("test");
+		$videoDB='test';
+		//$videoDB='record';
+		$collection=$db->selectCollection("$videoDB");
 		//$collection=db->record;
 		$searchphrase = $_POST['search'];
 		$orderby = $_POST['order'];
