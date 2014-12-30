@@ -4,7 +4,7 @@ mongo
 db.record.find({$or:[{content:/.*video by M.*/},{title:/.*PSY.*/}]});
 
 tags
-db.test.findOne({tag:{$in:["banana","haha"]}})
+db.test.findOne({tags:{$in:["banana","haha"]}})
 db.test.update(  { _id: XXX }, { $addToSet: { tags: "accessories" } }   )
 db.lastTagDB.update({tags:"music"},{ $inc:{count:1}, $set:{ tags:"music"} },{upsert:true}    )
 
