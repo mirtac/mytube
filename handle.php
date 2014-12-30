@@ -118,55 +118,57 @@ if(count($_POST)>0){
 			*/
 
 		}
-		if($type=='insert'){//TODO
-				$id= $_POST['id'];
-				$title = $_POST[''];
-				$published = $_POST[''];
-				$content = $_POST[''];
-				$category = $_POST[''];
-				$duration = $_POST[''];
-				$favoriteCOunt = $_POST[''];
-				$viewCount = $_POST[''];
-				$author = $_POST[''];
-				$keyword = $_POST[''];
-				$uid = $_POST[''];
-				$tag = 'tag';
-				$dislike= 'dislike';
-				$db = mongoConnect();
-				$collection=$db->selectCollection("$videoDB");
-				$result = $collection->find(array('id' => $id))->count();
+		elseif($type=='manageVideo'){//TODO
+				if($type=='insert'){//TODO
+						$id= $_POST['id'];
+						$title = $_POST[''];
+						$published = $_POST[''];
+						$content = $_POST[''];
+						$category = $_POST[''];
+						$duration = $_POST[''];
+						$favoriteCOunt = $_POST[''];
+						$viewCount = $_POST[''];
+						$author = $_POST[''];
+						$keyword = $_POST[''];
+						$uid = $_POST[''];
+						$tag = 'tag';
+						$dislike= 'dislike';
+						$db = mongoConnect();
+						$collection=$db->selectCollection("$videoDB");
+						$result = $collection->find(array('id' => $id))->count();
 
 
-				if($result!=0){//alert already have the same account;
-						echo '<script>document.location.href="./error.php?errno=1"</script>';
+						if($result!=0){//TODO  this is create account
+								echo '<script>document.location.href="./error.php?errno=1"</script>';
+						}
+						else{
+								$doc = [ "account" => $account , "email" => $email , "passwd" => $passwd , 'name' => $name];
+								$collection->insert($doc);
+								echo 'successful';
+						}
+
+						$query = "INSERT INTO $table (id,title ,published,content,category,duration,favoriteCount,viewCount,author,keyword,uid) VALUES ('$id','$title',$published,'$content',$duration,$favoriteCount,$viewCount,'$author','$keyword',$uid )";
 				}
-				else{
-						$doc = [ "account" => $account , "email" => $email , "passwd" => $passwd , 'name' => $name];
-						$collection->insert($doc);
-						echo 'successful';
+				elseif($type=='update'){
+						$query = "UPDATE $table SET title='$title',content='$content',category='$category',duration=$duration,author='$author',keyword='$keyword' WHERE id=$id";
 				}
-
-				$query = "INSERT INTO $table (id,title ,published,content,category,duration,favoriteCount,viewCount,author,keyword,uid) VALUES ('$id','$title',$published,'$content',$duration,$favoriteCount,$viewCount,'$author','$keyword',$uid )";
-		}
-		elseif($type=='update'){//TODO
-				$query = "UPDATE $table SET title='$title',content='$content',category='$category',duration=$duration,author='$author',keyword='$keyword' WHERE id=$id";
-		}
-		elseif($type=='delete'){
-				//TODO
-		}
-		elseif ($type=='post'){
-				$textpost=str_replace ("\r\n","<br/>",$textpost);
-				$link = mysql_connect('localhost', 's499410039','sql321'); 
-				if(!$link) { 
-						die('Could not connect(339): ' . mysql_error()); 
-				} 
-				mysql_select_db("s499410039", $link);
+				elseif($type=='delete'){
+						//TODO
+				}
+				elseif ($type=='post'){//NOT USE
+						$textpost=str_replace ("\r\n","<br/>",$textpost);
+						$link = mysql_connect('localhost', 's499410039','sql321'); 
+						if(!$link) { 
+								die('Could not connect(339): ' . mysql_error()); 
+						} 
+						mysql_select_db("s499410039", $link);
 
 
-				$queryString="insert into message (content,aid) values ('$textpost',$aid)";
+						$queryString="insert into message (content,aid) values ('$textpost',$aid)";
 				//echo $queryString;
 				$result = mysql_query($queryString);
 				echo '<script>document.location.href="./wall.php"</script>';
+				}
 		}
 		elseif ($type=='comment'){
 				//echo 'text='.$textpost.'<br/>';
@@ -176,6 +178,9 @@ if(count($_POST)>0){
 				$db = mongoConnect();
 				$collection=$db->selectCollection("commentDB");
 				if(isSet($_POST['message'])){//TODO insert message to commentDB
+						if($_POST['message']==''){
+								break ;
+						}
 						$query = [ 
 								'uid'=> $_SESSION['uid'] ,
 								'vid' => $_POST['vid'] ,
@@ -183,7 +188,11 @@ if(count($_POST)>0){
 								'name' => $_SESSION['name']
 										] ;
 //						var_dump($query);
-						$collection->insert($query);
+						try{
+								$collection->insert($query);
+						}catch(Exception $e){
+								echo "comment insert fail";
+						}
 
 				}
 				//TODO echo json for comment wall;
@@ -205,31 +214,8 @@ if(count($_POST)>0){
 
 
 				return;
-				$textpost=str_replace ("\r\n","<br/>",$textpost);
-				$link = mysql_connect('localhost', 's499410039','sql321'); 
-				if(!$link) { 
-						die('Could not connect(323): ' . mysql_error()); 
-				} 
-				mysql_select_db("s499410039", $link);
-
-
 				$queryString="insert into comment (comment,aid,mid) values ('$textpost',$aid,$mid)";
 
-				//echo $queryString;
-				$result = mysql_query($queryString);
-
-
-
-				/*$queryString="select * from message where mid=$mid";
-				$result = mysql_query($queryString);
-				$row=mysql_fetch_array($result);
-				$queryString="select * from account where aid=".$row["aid"];
-				$result = mysql_query($queryString);
-				$row=mysql_fetch_array($result);
-				$subject="some reply you";
-				$mes="$name reply you!!";
-				$tmp=mail($row["email"],$subject,$mes,"From: 499410039\n");
-				echo $row["email"].$subject.$mes."From: 499410039\n";*/
 				echo '<script>document.location.href="./wall.php"</script>';
 		}
 		else{
@@ -237,8 +223,10 @@ if(count($_POST)>0){
 		}
 }
 elseif (count($_GET>0)){
-		extract( $_GET );
-		if ($type=='mlike'){
+//		extract( $_GET );
+//TODO check is login    //all thing in get must login
+		$type = $_GET['type'];
+		if ($type=='mlike'){//NOT USE
 				$link = mysql_connect('localhost', 's499410039','sql321'); 
 				if(!$link) { 
 						die('Could not connect(112): ' . mysql_error()); 
@@ -261,7 +249,7 @@ elseif (count($_GET>0)){
 				}
 
 		}
-		elseif ($type=='clike'){
+		elseif ($type=='clike'){//NOT USE
 				$link = mysql_connect('localhost', 's499410039','sql321'); 
 				if(!$link) { 
 						die('Could not connect: (51)' . mysql_error()); 
@@ -291,18 +279,81 @@ elseif (count($_GET>0)){
 				foreach ($_SESSION as $i => $value) {
 						unset($_SESSION[$i]);
 				}
-				var_dump($_SESSION);
-				echo '['.$_SESSION['uid'].']';
+				//echo '['.$_SESSION['uid'].']';
 				/*logout!*/
 				
-			/*	echo $_SESSION["account"].'logout<br>';
+				echo $_SESSION['name'].'logout<br>';
 				echo 'turn to sign in 1 sec<br>';
-				echo '<script>setTimeout(function() { document.location.href="./signin.php";}, 1000);</script>';
-			*/
+				echo '<script>setTimeout(function() { document.location.href="./signin.php";}, 2000);</script>';
+			
 
 		}
+		elseif($type=='getlist'){
+				$limitCount=20;
+				$skipCount=0;
+				//TODO check whether isSet ($_GET)[$which,$title,$vid]
+				$which = $_GET['which'];
+				if($which=='history'){
+						$which .= 'ListDB';
+				}
+				else{
+						echo "something wrong at getList";
+				}
+				$db = mongoConnect();
+				$collection=$db->selectCollection($which);
+				$loginQuery = [ 'uid' => $_SESSION['uid']   ] ;
+				$ops = array(
+								array(
+										'$match' => array(
+												'uid' => $_SESSION['uid']
+												)
+									 ),
+								array(
+										'$limit' => $limitCount
+									 ),
+								array(
+										'$skip'  => $skipCount
+								)
+							);
 
-		echo '<script>document.location.href="./wall.php"</script>';
+				$result= $collection->aggregate($ops);
+				echo json_encode($result['result']);
+
+
+		}
+		elseif($type=='addToList'){
+				$limitCount=20;
+				$skipCount=0;
+				$which = $_GET['which'];
+				//TODO check whether isSet ($_GET)[$which,$title,$vid]
+				if($which=='history'){
+						$which .= 'ListDB';
+				}
+				else{
+						echo "something wrong at getList";
+						return;
+				}
+				$db = mongoConnect();
+				$collection=$db->selectCollection($which);
+				$loginQuery = [ 'uid' => $_SESSION['uid']   ] ;
+						
+				$title = $_GET['title'];
+				$title = substr($title,0,15).((strlen($title)>15)?"...":"");
+				$doc = [ "uid" => $_SESSION['uid'] , "vid" => $_GET['vid'] , "title" => $title];
+				try{
+						$collection->insert($doc);
+				}
+				catch(Exception $e){
+						echo 'dupicate';
+				}
+				return;
+
+		}
+		else{
+				echo 'not define get method';
+			//	echo '<script>document.location.href="./wall.php"</script>';
+		}
+
 }
 else{
 		echo '<script>document.location.href="./signin.php"</script>';
