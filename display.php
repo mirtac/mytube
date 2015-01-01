@@ -57,7 +57,7 @@ function httpGetRequest(method,data) {
 				if(method=='addToList'){
 						url = 'handle.php?type=addToList';
 						which=data.which;
-						url+="&which="+which+"&vid="+data.id+"&title="+data.title;
+						url+="&which="+which+"&vid="+data.vid+"&title="+data.title;
 						//req.onreadystatechange = processSearchReqChange;
 				}
 				else if(method=='comment'){
@@ -68,7 +68,57 @@ function httpGetRequest(method,data) {
 		}
 		return true;
 }
-function getData(method,id) {
+function getData(method,data) {
+		//url = 'http://140.123.101.185:5182/~tan/data/youtube/search.php';
+		//url = 'search.php';
+		req = false;
+		if(window.XMLHttpRequest) {
+				try { req = new XMLHttpRequest();
+				} catch(e) {
+						req = false; }
+		} else if(window.ActiveXObject) {
+				try { req = new ActiveXObject("Msxml2.XMLHTTP");
+				} catch(e) {
+						try { req = new ActiveXObject("Microsoft.XMLHTTP");
+						} catch(e) { req = false; } 
+				} 
+		}
+		if(req) {
+				if(method=='getlist'){//call by getData("getlist",listname.toString());
+						url = 'handle.php';
+						req.onreadystatechange = processListReqChange;
+						$("#message").html(data+" List");
+						parameter="?type=getlist&which="+data;
+						clearDiv("all");
+				}
+				else if(method=='comment'){
+						url = 'handle.php';
+						req.onreadystatechange = processCommentReqChange;
+						parameter="type=comment&vid="+data.vid;
+						if($("#comment").val() ==''){
+						}
+						else{
+								parameter+="&message="+$("#comment").val();
+						}
+				}
+				else if(method=='test'){
+						url = 'handle.php';
+						req.onreadystatechange = processTestReqChange;
+						parameter="type=comment&vid="+data.vid;
+						if($("#comment").val() ==''){
+						}
+						else{
+								parameter+="&message="+$("#comment").val();
+						}
+				}
+	
+				req.open("GET", url+parameter, true);
+				req.send();
+		}
+		return true;
+}
+
+function getPostData(method,data) {
 		//url = 'http://140.123.101.185:5182/~tan/data/youtube/search.php';
 		//url = 'search.php';
 		req = false;
@@ -95,7 +145,7 @@ function getData(method,id) {
 				else if(method=='comment'){
 						url = 'handle.php';
 						req.onreadystatechange = processCommentReqChange;
-						parameter="type=comment&vid="+id;
+						parameter="type=comment&vid="+data.vid;
 						if($("#comment").val() ==''){
 						}
 						else{
@@ -105,7 +155,7 @@ function getData(method,id) {
 				else if(method=='test'){
 						url = 'handle.php';
 						req.onreadystatechange = processTestReqChange;
-						parameter="type=comment&vid="+id;
+						parameter="type=comment&vid="+data.vid;
 						if($("#comment").val() ==''){
 						}
 						else{
@@ -119,57 +169,21 @@ function getData(method,id) {
 		}
 		return true;
 }
-
-function getPostData(method,id) {
-		//url = 'http://140.123.101.185:5182/~tan/data/youtube/search.php';
-		//url = 'search.php';
-		req = false;
-		if(window.XMLHttpRequest) {
-				try { req = new XMLHttpRequest();
-				} catch(e) {
-						req = false; }
-		} else if(window.ActiveXObject) {
-				try { req = new ActiveXObject("Msxml2.XMLHTTP");
-				} catch(e) {
-						try { req = new ActiveXObject("Microsoft.XMLHTTP");
-						} catch(e) { req = false; } 
+function processListReqChange(){
+		if(req.readyState==4){
+				tmp = req.responseText;
+				//$("#video").html(tmp);
+				try {
+						obj = JSON.parse(tmp);
 				} 
+				catch (e) {
+						clearDiv("#message");
+						console.log(tmp);
+						return false;
+				}
+				parseJsonToList("",obj);
 		}
-		if(req) {
-				if(method=='search'){
-						url = 'search.php';
-						req.onreadystatechange = processSearchReqChange;
-						$("#message").html('searching...');
-						parameter="search="+$("#search").val()+"&order="+$("#order").val()+"&method="+db;
-						clearDiv("all");
-						start = new Date().getTime();
-				}
-				else if(method=='comment'){
-						url = 'handle.php';
-						req.onreadystatechange = processCommentReqChange;
-						parameter="type=comment&vid="+id;
-						if($("#comment").val() ==''){
-						}
-						else{
-								parameter+="&message="+$("#comment").val();
-						}
-				}
-				else if(method=='test'){
-						url = 'handle.php';
-						req.onreadystatechange = processTestReqChange;
-						parameter="type=comment&vid="+id;
-						if($("#comment").val() ==''){
-						}
-						else{
-								parameter+="&message="+$("#comment").val();
-						}
-				}
-	
-				req.open("POST", url, true);
-				req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-				req.send(parameter);
-		}
-		return true;
+
 }
 function processSearchReqChange(){
 		if(req.readyState==4){
@@ -184,7 +198,7 @@ function processSearchReqChange(){
 						console.log(tmp);
 						return false;
 				}
-				parseJsonToList("total searching time : "+ (end - start) + " ms");
+				parseJsonToList("total searching time : "+ (end - start) + " ms",obj);
 		}
 }
 function processTestReqChange(){
@@ -214,33 +228,40 @@ function processCommentReqChange(){
 				//console.log(commentHtmlCode);
 		}
 }
-function parseJsonToList(message){
+function parseJsonToList(message,obj){
 
 		var innerstring='';
-		$("#message").html(message);
+		if(message!=""){
+				$("#message").html(message);
+		}
 		for(var i = 0; i < obj.length; i++) {
 				/*date transfer*/
-				time = new Date(obj[i].published.sec * 1000000);//should *1000,because wrong in put data to db
-				obj[i].published=time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
+				if(obj[i].published){//should *1000,because wrong in put data to db
+						time = new Date(obj[i].published.sec * 1000000);
+						obj[i].published=time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
+				}
 				//obj[i].published=time;
 				
 				/**/
-				innerstring+='<div class="videoList" id="'+obj[i].id+'" onClick="playvideo(this)">';
-				innerstring+='<img id="'+obj[i].id+'"src="http://i.ytimg.com/vi/'+obj[i].id;
+				innerstring+='<div class="videoList" id="'+obj[i].vid+'" onClick="playvideo(this)">';
+				innerstring+='<img id="'+obj[i].vid+'"src="http://i.ytimg.com/vi/'+obj[i].vid;
 				innerstring+='/mqdefault.jpg" onerror="imgError(this)"/>';
 				innerstring+='<div class="info">';
 				innerstring+='<div class="title">'+obj[i].title+'</div>';
-				innerstring+='<div class="published">'+obj[i].published;
-				innerstring+='</div><div class="author">'+obj[i].author+'</div><div class="duration">';
-				innerstring+=obj[i].duration+'</div><div class="viewCount">'+obj[i].viewCount
-				innerstring+='</div></div>';
+				if(obj[i].published&&obj[i].author&&obj[i].duration&&obj[i].viewCount){
+						innerstring+='<div class="published">'+obj[i].published+'</div>';
+						innerstring+='<div class="author">'+obj[i].author;
+						innerstring+='</div><div class="duration">'+obj[i].duration+'</div>';
+						innerstring+='<div class="viewCount">'+obj[i].viewCount+'</div>';
+				}
+				innerstring+='</div>';
 				innerstring+='<span class="jsondata">'+JSON.stringify(obj[i])+'</span></div>';
 		}
 		if(obj.length==0){
 				innerstring='<div style="text-align:center"><h2>no result</h2></div>';
 		}
 		$("#video").html(innerstring);
-		//console.log("###!"+$("#"+obj[0].id+" .jsondata").text());
+		//console.log("###!"+$("#"+obj[0].vid+" .jsondata").text());
 
 }
 function playvideo(video){
@@ -252,7 +273,7 @@ function playvideo(video){
 		/*video*/
 		iframeWidth=Math.floor(($(window).width()*6/10)-5);
 		htmlcode='<iframe width="'+iframeWidth+'" height="'+Math.floor((iframeWidth*0.56));
-		htmlcode+='" src="//www.youtube.com/embed/'+videoJson.id;
+		htmlcode+='" src="//www.youtube.com/embed/'+videoJson.vid;
 		htmlcode+='" frameborder="0" allowfullscreen></iframe>';
 		htmlcode+='<div class="title">'+videoJson.title+'</div>';
 		htmlcode+='<div class="author">Author : '+videoJson.author+'</div><div class="infoRow">';
@@ -262,19 +283,23 @@ function playvideo(video){
 		htmlcode+=videoJson.published+'</td></tr><tr><td>category</td><td>'+videoJson.category+'</td></tr></table>';
 		/*comment post form*/
 		htmlcode+='<input type="text" id="comment" name="comment" placeholder="comment"></input>';
-		htmlcode+='<input type="button" onClick="getPostData(\'comment\',\''+videoJson.id+'\')" value="comment"/>';
+		htmlcode+='<input type="button" onClick="getPostData(\'comment\',\''+videoJson+'\')" value="comment"/>';
 		if($("#relationVideo").html() == "" )$("#relationVideo").html($("#video").html());//TODO relationvideo list
 		$("#video").html('');
 		$("#videoPlay").html(htmlcode);
-			
+		
+		//set history
 		videoJson.which = "history";
 		httpGetRequest("addToList",videoJson);
-		getPostData('comment',videoJson.id);
+
+		getPostData('comment',videoJson);
 		return;
 }
 function showList(listname){
 		$("#userbtn").attr('class','btn-group');
-		console.log(listname);
+		if(listname=="history"){
+				getData("getlist","history");
+		}
 		return true;
 }
 function imgError(image) {
