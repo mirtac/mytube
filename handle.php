@@ -100,24 +100,6 @@ if(count($_POST)>0){
 				}
 				return;
 		}
-		elseif($type=='logout'){//session_unset();or: unset($_SESSION["XXX"]);
-				/*logout!*/
-
-				var_dump($_SESSION);
-				echo '<br/>';
-				foreach ($_SESSION as $i => $value) {
-						unset($_SESSION[$i]);
-				}
-				var_dump($_SESSION);
-				echo '['.$_SESSION['uid'].']';
-				/*logout!*/
-				
-			/*	echo $_SESSION["account"].'logout<br>';
-				echo 'turn to sign in 1 sec<br>';
-				echo '<script>setTimeout(function() { document.location.href="./signin.php";}, 1000);</script>';
-			*/
-
-		}
 		elseif($type=='manageVideo'){//TODO
 				if($type=='insert'){//TODO
 						$id= $_POST['id'];
@@ -154,20 +136,6 @@ if(count($_POST)>0){
 				}
 				elseif($type=='delete'){
 						//TODO
-				}
-				elseif ($type=='post'){//NOT USE
-						$textpost=str_replace ("\r\n","<br/>",$textpost);
-						$link = mysql_connect('localhost', 's499410039','sql321'); 
-						if(!$link) { 
-								die('Could not connect(339): ' . mysql_error()); 
-						} 
-						mysql_select_db("s499410039", $link);
-
-
-						$queryString="insert into message (content,aid) values ('$textpost',$aid)";
-				//echo $queryString;
-				$result = mysql_query($queryString);
-				echo '<script>document.location.href="./wall.php"</script>';
 				}
 		}
 		elseif ($type=='comment'){
@@ -214,9 +182,6 @@ if(count($_POST)>0){
 
 
 				return;
-				$queryString="insert into comment (comment,aid,mid) values ('$textpost',$aid,$mid)";
-
-				echo '<script>document.location.href="./wall.php"</script>';
 		}
 		else{
 				echo "undifine";

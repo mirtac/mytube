@@ -126,3 +126,7 @@ z-index: -1;
 .signin{
 		        text-align:center;
 }
+.userSetting{
+		height:40px;
+		width:40px;
+}

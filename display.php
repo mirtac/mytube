@@ -14,7 +14,10 @@ else{
 <link rel="stylesheet" type="text/css" href="style.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js">
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="http://platform.twitter.com/widgets.js" async></script>
+
 </script>
 <script>
 var start = 0;
@@ -116,6 +119,58 @@ function getData(method,id) {
 		}
 		return true;
 }
+
+function getPostData(method,id) {
+		//url = 'http://140.123.101.185:5182/~tan/data/youtube/search.php';
+		//url = 'search.php';
+		req = false;
+		if(window.XMLHttpRequest) {
+				try { req = new XMLHttpRequest();
+				} catch(e) {
+						req = false; }
+		} else if(window.ActiveXObject) {
+				try { req = new ActiveXObject("Msxml2.XMLHTTP");
+				} catch(e) {
+						try { req = new ActiveXObject("Microsoft.XMLHTTP");
+						} catch(e) { req = false; } 
+				} 
+		}
+		if(req) {
+				if(method=='search'){
+						url = 'search.php';
+						req.onreadystatechange = processSearchReqChange;
+						$("#message").html('searching...');
+						parameter="search="+$("#search").val()+"&order="+$("#order").val()+"&method="+db;
+						clearDiv("all");
+						start = new Date().getTime();
+				}
+				else if(method=='comment'){
+						url = 'handle.php';
+						req.onreadystatechange = processCommentReqChange;
+						parameter="type=comment&vid="+id;
+						if($("#comment").val() ==''){
+						}
+						else{
+								parameter+="&message="+$("#comment").val();
+						}
+				}
+				else if(method=='test'){
+						url = 'handle.php';
+						req.onreadystatechange = processTestReqChange;
+						parameter="type=comment&vid="+id;
+						if($("#comment").val() ==''){
+						}
+						else{
+								parameter+="&message="+$("#comment").val();
+						}
+				}
+	
+				req.open("POST", url, true);
+				req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				req.send(parameter);
+		}
+		return true;
+}
 function processSearchReqChange(){
 		if(req.readyState==4){
 				end = new Date().getTime();
@@ -129,7 +184,6 @@ function processSearchReqChange(){
 						console.log(tmp);
 						return false;
 				}
-//				console.log(obj);
 				parseJsonToList("total searching time : "+ (end - start) + " ms");
 		}
 }
@@ -157,12 +211,7 @@ function processCommentReqChange(){
 
 				}
 				$("#commentDiv").html(commentHtmlCode);
-				console.log(commentHtmlCode);
-		}
-		else{
-				console.log("["+req.readyState+"]");
-				tmp = req.responseText;
-				console.log(tmp);
+				//console.log(commentHtmlCode);
 		}
 }
 function parseJsonToList(message){
@@ -197,14 +246,15 @@ function parseJsonToList(message){
 function playvideo(video){
 		tmp = video.getElementsByClassName('jsondata')[0].innerHTML;
 		videoJson=JSON.parse(tmp);
-		$("#message").html(videoJson.title);
-		$("#message").css({"font-size":"1.1em","font-weight":"bolder"});
+		$("#message").html('');
+//		$("#message").css({"font-size":"1.1em","font-weight":"bolder"});
 		htmlcode='';
 		/*video*/
 		iframeWidth=Math.floor(($(window).width()*6/10)-5);
 		htmlcode='<iframe width="'+iframeWidth+'" height="'+Math.floor((iframeWidth*0.56));
 		htmlcode+='" src="//www.youtube.com/embed/'+videoJson.id;
-		htmlcode+='" frameborder="0" allowfullscreen></iframe>';//'<div class="title">'+videoJson.title+'</div>'
+		htmlcode+='" frameborder="0" allowfullscreen></iframe>';
+		htmlcode+='<div class="title">'+videoJson.title+'</div>';
 		htmlcode+='<div class="author">Author : '+videoJson.author+'</div><div class="infoRow">';
 		htmlcode+='<div class="viewCount">views : '+videoJson.viewCount+'</div><div  class="favoriteCount">';
 		htmlcode+='likes : '+videoJson.favoriteCount+'</div></div><div class="content">';
@@ -212,15 +262,20 @@ function playvideo(video){
 		htmlcode+=videoJson.published+'</td></tr><tr><td>category</td><td>'+videoJson.category+'</td></tr></table>';
 		/*comment post form*/
 		htmlcode+='<input type="text" id="comment" name="comment" placeholder="comment"></input>';
-		htmlcode+='<input type="button" onClick="getData(\'comment\',\''+videoJson.id+'\')" value="comment"/>';
+		htmlcode+='<input type="button" onClick="getPostData(\'comment\',\''+videoJson.id+'\')" value="comment"/>';
 		if($("#relationVideo").html() == "" )$("#relationVideo").html($("#video").html());//TODO relationvideo list
 		$("#video").html('');
 		$("#videoPlay").html(htmlcode);
 			
 		videoJson.which = "history";
 		httpGetRequest("addToList",videoJson);
-		getData('comment',videoJson.id);
+		getPostData('comment',videoJson.id);
 		return;
+}
+function showList(listname){
+		$("#userbtn").attr('class','btn-group');
+		console.log(listname);
+		return true;
 }
 function imgError(image) {
 		image.onerror = "";
@@ -228,15 +283,27 @@ function imgError(image) {
 		return true;
 }
 function setUserInfo(){
-		name = '<?php echo $name.'  <a href="./handle.php?type=logout">logout</a>';?>';
-		signin='';
+		name = '<?php echo $name;?>';
+		userSet='';
 		if(name=='guest'){
-				signin='    <a href="signin.php">SIGN IN?</a>';
+				userSet=name+'    <a href="signin.php">SIGN IN?</a>';
+				$("#userinfo").html(userSet);
 		}
 		else{
+				//signin='  <a href="./handle.php?type=logout">logout</a>';
+				//signin='<img class="userSetting" src="./image/gear.png" onmouseover="console.log(\'123\')">';
+				$("#userName").html(name);
+			
 
 		}
-		$("#userinfo").html(name+signin);
+		$("#usermenu").click(function(){
+				if( $("#userbtn").attr('class')=='btn-group open' ){
+				$("#userbtn").attr('class','btn-group');
+				}
+				else{
+						$("#userbtn").attr('class','btn-group open');
+				}
+		});
 
 
 }
@@ -245,11 +312,28 @@ function setUserInfo(){
 <body>
 <div class="topbar">
 <span style="position:absolute;" id="message"></span>
-<span style="position:absolute;right:5%;z-index:5" id="userinfo"></span>
+<span style="position:absolute;right:5%;z-index:5" id="userinfo">
+<div id="userbtn" class="btn-group">
+<a class="btn btn-primary" href="#" id="userName"></a>
+<a id="usermenu" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
+<span class="caret"></span></a>
+<ul class="dropdown-menu">
+<li><a onClick="showList('history')">History List</a></li>
+<li><a onClick="showList('upload')">Upload List</a></li>
+<li><a onClick="showList('favorite')">Favorite List</a></li>
+<li><a onClick="showList('like')">like List</a></li>
+<li><a onClick="showList('comment')">comment List</a></li>
+<li class="divider"></li>
+<li><a href="./handle.php?type=logout">Logout</a></li>
+</ul>
+				</div>
+	
+
+</span>
 	<div class="searchBox">
 		<form method="post" name="info">
 		<input type="text" id="search" name="search" placeholder="search"></input>
-		<input type="button" onClick="getData('search')" value="search"/>
+		<input type="button" onClick="getPostData('search')" value="search"/>
 		order by:<select name="orderBy" id="order"> 
 		<option value="" selected="selected">none</option>
 		<option value="viewCount" >view count</option>
