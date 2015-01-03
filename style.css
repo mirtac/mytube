@@ -37,6 +37,7 @@ background-color: #CC66FF;
 padding: 3px;
 margin: 3%;
 border: solid 3px #A7A7A8;
+border-radius: 10px;
 }
 
 /*.videoList{
@@ -51,6 +52,7 @@ width:550px;
 .videoList:hover{
 background-color:#EFEFB6;
 transition:1s;
+box-shadow: 0 3px 5px rgba(253, 25, 25, 0.4);
 }
 .relationVideo .videoList{
 position:relative;
@@ -129,4 +131,8 @@ z-index: -1;
 .userSetting{
 		height:40px;
 		width:40px;
+}
+img.icon{
+		width: 1em;
+		height: 1em;
 }
