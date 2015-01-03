@@ -60,7 +60,15 @@ function httpGetRequest(method,data) {
 						url+="&which="+which+"&vid="+data.vid+"&title="+data.title;
 						//req.onreadystatechange = processSearchReqChange;
 				}
-				else if(method=='comment'){
+				else if(method=='favorite'){
+						url = 'handle.php?type=addToList';
+						title=$("#"+data.vid+" .info .title").html();
+						url+="&which=favorite"+"&vid="+data.vid+"&title="+title;
+				}
+				else if(method=='like'||method=='dislike'){//TODO
+				}
+				else {
+						return false;
 				}
 	
 				req.open("GET", url, true);
@@ -277,8 +285,23 @@ function playvideo(video){
 		htmlcode+='" frameborder="0" allowfullscreen></iframe>';
 		htmlcode+='<div class="title">'+videoJson.title+'</div>';
 		htmlcode+='<div class="author">Author : '+videoJson.author+'</div><div class="infoRow">';
-		htmlcode+='<div class="viewCount">views : '+videoJson.viewCount+'</div><div  class="favoriteCount">';
-		htmlcode+='likes : '+videoJson.favoriteCount+'</div></div><div class="content">';
+		htmlcode+='<div class="viewCount">views : '+videoJson.viewCount+'</div>';
+		
+//		htmlcode+='<div  class="favoriteCount">likes : '+videoJson.favoriteCount+'</div>';
+
+		htmlcode+='<div id="likeSetting" class="btn-group favoriteCount">';
+		htmlcode+='<a class="btn btn-info" id="likes" onclick="httpGetRequest(\'like\')">';
+		htmlcode+='<img class="icon" src="image/like.png"/> ';
+		htmlcode+=videoJson.favoriteCount+'</a>';
+		htmlcode+='<a class="btn btn-info" id="dislikes" onclick="httpGetRequest(\'dislike\')">';
+		if(!videoJson.dislike){
+				videoJson.dislike=0;
+		}
+		htmlcode+='<img class="icon" src="image/dislike.png"> '+videoJson.dislike+'</a>';
+		htmlcode+='<a onClick="video.vid=\''+videoJson.vid+'\';httpGetRequest(\'favorite\',video)" class="btn btn-info"><img class="icon" src="image/star.png"/></a>';
+		htmlcode+='</div>';
+	
+		htmlcode+='</div><div class="content">';
 		htmlcode+=videoJson.content+'</div><table class="infoTable"><tr><td>published</td><td>';
 		htmlcode+=videoJson.published+'</td></tr><tr><td>category</td><td>'+videoJson.category+'</td></tr></table>';
 		/*comment post form*/
@@ -297,9 +320,7 @@ function playvideo(video){
 }
 function showList(listname){
 		$("#userbtn").attr('class','btn-group');
-		if(listname=="history"){
-				getData("getlist","history");
-		}
+		getData("getlist",listname);
 		return true;
 }
 function imgError(image) {
@@ -351,7 +372,7 @@ function setUserInfo(){
 <li class="divider"></li>
 <li><a href="./handle.php?type=logout">Logout</a></li>
 </ul>
-				</div>
+</div>
 	
 
 </span>
