@@ -102,7 +102,7 @@ if(count($_POST)>0){
 		}
 		elseif($type=='manageVideo'){//TODO
 				if($type=='insert'){//TODO
-						$id= $_POST['id'];
+						$vid= $_POST['vid'];
 						$title = $_POST[''];
 						$published = $_POST[''];
 						$content = $_POST[''];
@@ -117,7 +117,7 @@ if(count($_POST)>0){
 						$dislike= 'dislike';
 						$db = mongoConnect();
 						$collection=$db->selectCollection("$videoDB");
-						$result = $collection->find(array('id' => $id))->count();
+						$result = $collection->find(array('vid' => $vid))->count();
 
 
 						if($result!=0){//TODO  this is create account
@@ -191,6 +191,9 @@ elseif (count($_GET>0)){
 //		extract( $_GET );
 //TODO check is login    //all thing in get must login
 		$type = $_GET['type'];
+		if(isset($_SESSION['uid'])){
+		}
+		else return false;
 		if ($type=='mlike'){//NOT USE
 				$link = mysql_connect('localhost', 's499410039','sql321'); 
 				if(!$link) { 
@@ -291,7 +294,7 @@ elseif (count($_GET>0)){
 				$skipCount=0;
 				$which = $_GET['which'];
 				//TODO check whether isSet ($_GET)[$which,$title,$vid]
-				if($which=='history'){
+				if($which=='history'||$which=='upload' || $which=='favorite'){
 						$which .= 'ListDB';
 				}
 				else{
