@@ -80,7 +80,6 @@ visibility: hidden;
 .videoPlay {
 position:relative;
 width:60%;
-float:left;
 }
 .videoPlay *{
 //width:60%;
@@ -122,7 +121,26 @@ width:30%;
 .commentDiv{
 position:relative;
 width:60%;
-z-index: -1;
+//z-index: -1;
+}
+.comment{
+border-radius: 10px;
+border: solid 3px #A7A7A8;
+margin-bottom:5px;
+background-color: rgba(95, 100, 10, 0.2);
+min-height: 80px;
+}
+.comment *{
+padding:3px;
+}
+.comment .name{
+		font-size:1.5em;
+		font-weight:bold;
+}
+.comment .date{
+		font-size:0.7em;
+}
+.comment .content{
 }
 /*signin.php*/
 .signin{
