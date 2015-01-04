@@ -2,6 +2,7 @@
 session_start();
 if(isSet($_SESSION["uid"])){
 		$name = $_SESSION['name'];
+		$uid = $_SESSION['uid'];
 }
 else{
 		$name = 'guest';
@@ -24,6 +25,8 @@ var start = 0;
 var end = 0;
 var db="mysql";
 var obj;
+var name;
+var uid;
 //db = "mysql";
 db = "mongo";
 function clearDiv(){
@@ -67,6 +70,13 @@ function httpGetRequest(method,data) {
 						url+="&which=favorite"+"&vid="+data.vid+"&title="+title;
 				}
 				else if(method=='like'||method=='dislike'){//TODO
+				}
+				else if(method=='deleteComment'){
+						url = 'handle.php?type=deleteComment';
+						url+="&cid="+data.cid+"&vid="+data.vid;//TODO vid
+						req.onreadystatechange = processCommentReqChange;
+						console.log(url);
+
 				}
 				else {
 						return false;
@@ -159,13 +169,14 @@ function getPostData(method,data) {
 						parameter="search="+$("#search").val()+"&sortField="+$("#order").val()+"&method="+db;
 						parameter+='&category='+$("#category").val();
 						clearDiv("all");
-						console.log(parameter);
+						//console.log(parameter);
 						start = new Date().getTime();
 				}
 				else if(method=='comment'){
 						url = 'handle.php';
 						req.onreadystatechange = processCommentReqChange;
-						parameter="type=comment&vid="+data.vid;
+						parameter="type=comment&vid="+data;
+						console.log(url+parameter);
 						if($("#comment").val() ==''){
 						}
 						else{
@@ -233,15 +244,21 @@ function processCommentReqChange(){
 				tmp = req.responseText;
 				try{
 						obj = JSON.parse(tmp);
+						console.log(tmp);
 				}catch (e){
 						console.log('fail on processCommentReqChange');
 						console.log(tmp);
 						return false;
 				}
 				for(var i = 0; i < obj.length; i++) {
-						commentHtmlCode+='<div class="comment"><div class="date">'+obj[i].time; 
-						commentHtmlCode+='</div><div class="name">'+obj[i].name+'</div>';
-						commentHtmlCode+='<div class="content">'+obj[i].content+'</div></div>';
+						commentHtmlCode+='<div class="comment">';
+						commentHtmlCode+='<span class="name">'+obj[i].name+'</span>';
+						commentHtmlCode+='<span class="date">'+obj[i].time+'</span>'; 
+						commentHtmlCode+='<button class="btn btn-warning" onclick="var datac=new Object();datac.cid=\''+obj[i].cid;
+						commentHtmlCode+='\';datac.vid=\''+obj[i].vid+'\';httpGetRequest(\'deleteComment\',datac';
+						commentHtmlCode+=')">'+'delete'+'</button>'; 
+						commentHtmlCode+='<div class="content">'+obj[i].content+'</div>';
+						commentHtmlCode+='</div>';
 
 				}
 				$("#commentDiv").html(commentHtmlCode);
@@ -249,7 +266,6 @@ function processCommentReqChange(){
 		}
 }
 function parseJsonToList(message,obj){
-
 		var innerstring='';
 		if(message!=""){
 				$("#message").html(message);
@@ -318,7 +334,7 @@ function playvideo(video){
 		htmlcode+=videoJson.published+'</td></tr><tr><td>category</td><td>'+videoJson.category+'</td></tr></table>';
 		/*comment post form*/
 		htmlcode+='<input type="text" id="comment" name="comment" placeholder="comment"></input>';
-		htmlcode+='<input type="button" onClick="getPostData(\'comment\',\''+videoJson+'\')" value="comment"/>';
+		htmlcode+='<input type="button" onClick="getPostData(\'comment\',\''+videoJson.vid+'\')" value="comment"/>';
 		if($("#relationVideo").html() == "" )$("#relationVideo").html($("#video").html());//TODO relationvideo list
 		$("#video").html('');
 		$("#videoPlay").html(htmlcode);
@@ -327,7 +343,7 @@ function playvideo(video){
 		videoJson.which = "history";
 		httpGetRequest("addToList",videoJson);
 
-		getPostData('comment',videoJson);
+		getPostData('comment',videoJson.vid);
 		return;
 }
 function showList(listname){
@@ -342,6 +358,8 @@ function imgError(image) {
 }
 function setUserInfo(){
 		name = '<?php echo $name;?>';
+		uid = '<?php echo $uid;?>';
+
 		userSet='';
 		if(name=='guest'){
 				userSet=name+'    <a href="signin.php">SIGN IN?</a>';
@@ -426,14 +444,10 @@ function setUserInfo(){
 		</div>
 </div>
 <div class="pageContainer">
-	<div class="video" id="video"><!-- use js to asign video  -->
-	</div>
-	<div class="videoPlay" id="videoPlay">
-	<!-- for videoPlayer--!>
-	</div>
+	<div class="video" id="video"><!-- use js to asign video  --></div>
 	<div class="relationVideo" id="relationVideo"><!-- for relation list   --!></div>
-	<div class="commentDiv" id="commentDiv"><!-- show comment under videoPlay--!>
-	</div>
+	<div class="videoPlay" id="videoPlay"><!-- for videoPlayer--!></div>
+	<div class="commentDiv" id="commentDiv"><!-- show comment under videoPlay--!></div>
 </div>
 <script>
 setUserInfo();
