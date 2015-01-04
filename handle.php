@@ -175,7 +175,7 @@ if(count($_POST)>0){
 								echo ',';
 						}
 						else {$isFirst=false;}
-						echo '{"name":"'.$row['name'].'","content":"'.$row['content'].'","time":"'.date('Y-m-d',$row['_id']->getTimestamp()).'"}';
+						echo '{"name":"'.$row['name'].'","content":"'.$row['content'].'","time":"'.date('Y-m-d',$row['_id']->getTimestamp()).'","cid":"'.$row['_id'].'","vid":"'.$row['vid'].'"}';
 						//echo json_encode($row);
 				}
 				echo ']';
@@ -303,7 +303,6 @@ elseif (count($_GET>0)){
 				}
 				$db = mongoConnect();
 				$collection=$db->selectCollection($which);
-				$loginQuery = [ 'uid' => $_SESSION['uid']   ] ;
 						
 				$title = $_GET['title'];
 				$title = substr($title,0,15).((strlen($title)>15)?"...":"");
@@ -317,9 +316,45 @@ elseif (count($_GET>0)){
 				return;
 
 		}
+		elseif($type=='deleteComment'){
+				$db = mongoConnect();
+				$collection=$db->selectCollection('commentDB');
+				$cid=new MongoId($_GET['cid']);
+				$doc = [ "uid" => $_SESSION['uid'] , "vid" => $_GET['vid'] , "_id" => $cid];
+				try{
+						$collection->remove($doc);
+//						print_r($doc);
+				}
+				catch(Exception $e){
+						echo 'delete fail';
+						print_r($doc);
+				}
+				
+				$commentGetQuery = [ 'vid' => $_GET['vid'] ] ;
+
+				$result = $collection->find($commentGetQuery);
+				$result->timeout(-1);
+				$isFirst=true;
+				echo '[';
+				foreach($result as $k => $row){
+						if(!$isFirst){
+								echo ',';
+						}
+						else {$isFirst=false;}
+						echo '{"name":"'.$row['name'].'","content":"'.$row['content'].'","time":"'.date('Y-m-d',$row['_id']->getTimestamp()).'","cid":"'.$row['_id'].'","vid":"'.$row['vid'].'"}';
+						//echo json_encode($row);
+				}
+				echo ']';
+
+
+				return;
+
+				return;
+
+		}
 		else{
 				echo 'not define get method';
-			//	echo '<script>document.location.href="./wall.php"</script>';
+				//	echo '<script>document.location.href="./wall.php"</script>';
 		}
 
 }
