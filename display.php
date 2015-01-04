@@ -54,11 +54,12 @@ function httpGetRequest(method,data) {
 				} 
 		}
 		if(req) {
-				if(method=='addToList'){
+				if(method=='addToList'){//history
 						url = 'handle.php?type=addToList';
 						which=data.which;
 						url+="&which="+which+"&vid="+data.vid+"&title="+data.title;
 						//req.onreadystatechange = processSearchReqChange;
+						//console.log(url);return;
 				}
 				else if(method=='favorite'){
 						url = 'handle.php?type=addToList';
@@ -77,8 +78,6 @@ function httpGetRequest(method,data) {
 		return true;
 }
 function getData(method,data) {
-		//url = 'http://140.123.101.185:5182/~tan/data/youtube/search.php';
-		//url = 'search.php';
 		req = false;
 		if(window.XMLHttpRequest) {
 				try { req = new XMLHttpRequest();
@@ -119,6 +118,17 @@ function getData(method,data) {
 								parameter+="&message="+$("#comment").val();
 						}
 				}
+				else if(method=='search'){
+						url = 'search.php';
+						req.onreadystatechange = processSearchReqChange;
+						$("#message").html('searching...');
+						parameter="search="+$("#search").val()+"&sortField="+$("#order").val()+"&method="+db;
+						parameter+='&category='+$("#category");
+						parameter+="&page="+data.page;
+						clearDiv("all");
+						start = new Date().getTime();
+				}
+
 	
 				req.open("GET", url+parameter, true);
 				req.send();
@@ -146,8 +156,10 @@ function getPostData(method,data) {
 						url = 'search.php';
 						req.onreadystatechange = processSearchReqChange;
 						$("#message").html('searching...');
-						parameter="search="+$("#search").val()+"&order="+$("#order").val()+"&method="+db;
+						parameter="search="+$("#search").val()+"&sortField="+$("#order").val()+"&method="+db;
+						parameter+='&category='+$("#category").val();
 						clearDiv("all");
+						console.log(parameter);
 						start = new Date().getTime();
 				}
 				else if(method=='comment'){
@@ -380,14 +392,38 @@ function setUserInfo(){
 		<form method="post" name="info">
 		<input type="text" id="search" name="search" placeholder="search"></input>
 		<input type="button" onClick="getPostData('search')" value="search"/>
-		order by:<select name="orderBy" id="order"> 
-		<option value="" selected="selected">none</option>
-		<option value="viewCount" >view count</option>
-		<option VALUE="published"> creation time</option>
-		<option VALUE="duration">video length</option>
+		<!--img class="icon" src="image/gear.png" onClick="advSearch()"/-->
+		<select name="orderBy" id="order"> 
+		<option value="" selected="selected">--order by--</option>
+		<option value="viewCount" >Views</option>
+		<option VALUE="published">Upload date</option>
+		<option VALUE="duration">Duration</option>
 		</select>
+		
+		<select name="category" id="category"> 
+		<option value="" selected="selected">--category--</option>
+		<option value="Animals">Animals</option>
+		<option value="Autos">Autos</option>
+		<option value="Comedy">Comedy</option>
+		<option value="Education">Education</option>
+		<option value="Entertainment">Entertainment</option>
+		<option value="Film">Film</option>
+		<option value="Games">Games</option>
+		<option value="Howto">Howto</option>
+		<option value="Movies">Movies</option>
+		<option value="Music">Music</option>
+		<option value="News">News</option>
+		<option value="Nonprofit">Nonprofit</option>
+		<option value="People">People</option>
+		<option value="Sports">Sports</option>
+		<option value="Shows">Shows</option>
+		<option value="Tech">Tech</option>
+		<option value="Trailers">Trailers</option>
+		<option value="Travel">Travel</option>
+		</select>
+
 		</form>
-	</div>
+		</div>
 </div>
 <div class="pageContainer">
 	<div class="video" id="video"><!-- use js to asign video  -->
