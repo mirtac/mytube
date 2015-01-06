@@ -72,7 +72,7 @@ if(count($_POST)>0){
 				echo '<script>document.location.href="./signin.php"</script>';
 		}
 		elseif ($type=='signin'){
-				var_dump($_POST);
+				//var_dump($_POST);
 				//extract( $_POST );
 				$account= $_POST['account'];
 				$passwd = $_POST['passwd'];
@@ -96,47 +96,9 @@ if(count($_POST)>0){
 				}
 				else {//TODO error account or passwd;
 //				echo "'$account' have not been registered    <a href='./create_account.php'>CREATE IT?</a><br/>";
-						echo 'login fail!! <a href="signin.php">SIGNIN</a>';
+						echo 'login fail!! <a href="./signin.php">SIGNIN</a>';
 				}
 				return;
-		}
-		elseif($type=='manageVideo'){//TODO
-				if($type=='insert'){//TODO
-						$vid= $_POST['vid'];
-						$title = $_POST[''];
-						$published = $_POST[''];
-						$content = $_POST[''];
-						$category = $_POST[''];
-						$duration = $_POST[''];
-						$favoriteCOunt = $_POST[''];
-						$viewCount = $_POST[''];
-						$author = $_POST[''];
-						$keyword = $_POST[''];
-						$uid = $_POST[''];
-						$tag = 'tag';
-						$dislike= 'dislike';
-						$db = mongoConnect();
-						$collection=$db->selectCollection("$videoDB");
-						$result = $collection->find(array('vid' => $vid))->count();
-
-
-						if($result!=0){//TODO  this is create account
-								echo '<script>document.location.href="./error.php?errno=1"</script>';
-						}
-						else{
-								$doc = [ "account" => $account , "email" => $email , "passwd" => $passwd , 'name' => $name];
-								$collection->insert($doc);
-								echo 'successful';
-						}
-
-						$query = "INSERT INTO $table (id,title ,published,content,category,duration,favoriteCount,viewCount,author,keyword,uid) VALUES ('$id','$title',$published,'$content',$duration,$favoriteCount,$viewCount,'$author','$keyword',$uid )";
-				}
-				elseif($type=='update'){
-						$query = "UPDATE $table SET title='$title',content='$content',category='$category',duration=$duration,author='$author',keyword='$keyword' WHERE id=$id";
-				}
-				elseif($type=='delete'){
-						//TODO
-				}
 		}
 		elseif ($type=='comment'){
 				//echo 'text='.$textpost.'<br/>';
@@ -166,7 +128,7 @@ if(count($_POST)>0){
 				//TODO echo json for comment wall;
 				$commentGetQuery = [ 'vid' => $_POST['vid'] ] ;
 
-				$result = $collection->find($commentGetQuery);
+				$result = $collection->find($commentGetQuery)->sort(['_id' => -1]);
 				$result->timeout(-1);
 				$isFirst=true;
 				echo '[';
@@ -175,7 +137,7 @@ if(count($_POST)>0){
 								echo ',';
 						}
 						else {$isFirst=false;}
-						echo '{"name":"'.$row['name'].'","content":"'.$row['content'].'","time":"'.date('Y-m-d',$row['_id']->getTimestamp()).'","cid":"'.$row['_id'].'","vid":"'.$row['vid'].'"}';
+						echo '{"name":"'.$row['name'].'","content":"'.$row['content'].'","time":"'.date('Y-m-d',$row['_id']->getTimestamp()).'","cid":"'.$row['_id'].'","vid":"'.$row['vid'].'","uid":"'.$row['uid'].'"}';
 						//echo json_encode($row);
 				}
 				echo ']';
@@ -242,7 +204,7 @@ elseif (count($_GET>0)){
 		elseif($type=='logout'){//TODO dup logout
 				/*logout!*/
 
-				var_dump($_SESSION);
+			//	var_dump($_SESSION);
 				echo '<br/>';
 				foreach ($_SESSION as $i => $value) {
 						unset($_SESSION[$i]);
@@ -261,7 +223,7 @@ elseif (count($_GET>0)){
 				$skipCount=0;
 				//TODO check whether isSet ($_GET)[$which,$title,$vid]
 				$which = $_GET['which'];
-				if($which=='history'){
+				if($which=='history'||$which=='upload'||$which=='favorite'){
 						$which .= 'ListDB';
 				}
 				else{
@@ -332,7 +294,7 @@ elseif (count($_GET>0)){
 				
 				$commentGetQuery = [ 'vid' => $_GET['vid'] ] ;
 
-				$result = $collection->find($commentGetQuery);
+				$result = $collection->find($commentGetQuery)->sort([ '_id' => -1]);
 				$result->timeout(-1);
 				$isFirst=true;
 				echo '[';
@@ -341,7 +303,7 @@ elseif (count($_GET>0)){
 								echo ',';
 						}
 						else {$isFirst=false;}
-						echo '{"name":"'.$row['name'].'","content":"'.$row['content'].'","time":"'.date('Y-m-d',$row['_id']->getTimestamp()).'","cid":"'.$row['_id'].'","vid":"'.$row['vid'].'"}';
+						echo '{"name":"'.$row['name'].'","content":"'.$row['content'].'","time":"'.date('Y-m-d',$row['_id']->getTimestamp()).'","cid":"'.$row['_id'].'","vid":"'.$row['vid'].'","uid":"'.$row['uid'].'"}';
 						//echo json_encode($row);
 				}
 				echo ']';
@@ -350,6 +312,79 @@ elseif (count($_GET>0)){
 				return;
 
 				return;
+
+		}
+		elseif($type=='searchVideo'){
+				$db = mongoConnect();
+				$collection=$db->selectCollection($videoDB);
+				$doc = [ 'vid' => $_GET['vid'] ] ;
+				try{
+						$result = $collection->findOne($doc);
+				}catch(Exception $e){
+						echo 'search fail';
+						print_r($doc);
+						return;
+				}
+				echo json_encode($result);
+		}
+		elseif($type=='manageVideo'){//TODO
+				if($_GET['operation']=='insert'){//TODO
+						$vid= $_GET['vid'];
+						$title = $_GET['title'];
+						$content = $_GET['content'];
+						$category = $_GET['category'];
+						$duration = $_GET['duration'];
+						$favoriteCount = 0;
+						$viewCount = 0;
+						$author = $_GET['author'];
+						$keyword = $_GET['keyword'];
+						$uid = $_SESSION['uid'];
+						//$tag = 'tag';
+						$dislike= 0;
+						$db = mongoConnect();
+						$collection=$db->selectCollection("$videoDB");
+						$result = $collection->find(array('vid' => $vid))->count();
+						//print_r($_GET);return;
+
+
+						if($result==0){
+								$doc = [ "vid" => $vid , "title" => $title , "content" => $content ,
+								'category' => $category , 'duration' => $duration , 'favoriteCount' => $favoriteCount,
+								$viewCount => $viewCount , 'author' => $author , 'keyword' => $keyword
+								, 'uid' => $uid , 'dislike' => $dislike];
+								$collection->insert($doc);
+								$collection=$db->selectCollection("uploadListDB");
+								$doc = [ 'uid' => $_SESSION['uid'] , 'vid' => $vid , 'title' => $title ];
+								$collection->insert($doc);
+								echo 'successful';
+								echo '<script>setTimeout(function() { document.location.href="./display.php";}, 1500);</script>';
+						}
+						else{
+								echo 'video has already exists!';
+								echo '<script>setTimeout(function() { document.location.href="./display.php";}, 1500);</script>';
+						}
+
+						$query = "INSERT INTO $table (id,title ,published,content,category,duration,favoriteCount,viewCount,author,keyword,uid) VALUES ('$id','$title',$published,'$content',$duration,$favoriteCount,$viewCount,'$author','$keyword',$uid )";
+				}
+				elseif($_GET['operation']=='update'){//TODO
+						$query = "UPDATE $table SET title='$title',content='$content',category='$category',duration=$duration,author='$author',keyword='$keyword' WHERE id=$id";
+				}
+				elseif($_GET['operation']=='delete'){//TODO
+						//TODO
+				}
+		}
+		elseif($type=='command'){
+				return;
+				$db = mongoConnect();                         
+				$collection=$db->selectCollection("record");
+				$res = $collection->distinct('category');
+				$res->timeout(-1);
+				
+				foreach($res as  $i => $row){
+						$tmp=$row;
+				echo '<option value="'.$tmp.'">'.$tmp.'</option>'."\n";
+				//echo $row."\n";
+				}
 
 		}
 		else{
@@ -363,8 +398,8 @@ else{
 }
 
 /*?>
-</body>
-</html>
+  </body>
+  </html>
 */
 
 ?>

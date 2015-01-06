@@ -13,10 +13,10 @@ function mysqlConnect(){
 		return $db;
 
 }
-if(is_array($_POST)&&count($_POST)>0){
+if(is_array($_GET)&&count($_GET)>0){
 //		$db = mysqlConnect();
 		$table = 'test';
-		extract($_POST);
+		extract($_GET);
 		if($type=='insert'){
 				$query = "INSERT INTO $table (id,title ,published,content,category,duration,favoriteCount,viewCount,author,keyword,uid) VALUES ('$id','$title',$published,'$content',$duration,$favoriteCount,$viewCount,'$author','$keyword',$uid )";
 		}

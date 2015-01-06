@@ -133,13 +133,64 @@ function getData(method,data) {
 						req.onreadystatechange = processSearchReqChange;
 						$("#message").html('searching...');
 						parameter="search="+$("#search").val()+"&sortField="+$("#order").val()+"&method="+db;
-						parameter+='&category='+$("#category");
+						parameter+='&category='+$("#c_category");
 						parameter+="&page="+data.page;
 						clearDiv("all");
 						start = new Date().getTime();
 				}
+				else if(method=='getPage'){
+						clearDiv('all');
+						url = data;
+						parameter='';
+						req.onreadystatechange = function(){
+								if(req.readyState==4){
+										$("#video").html(req.responseText);
+								}
+						}
+				}
+				else if(method=='findByID'){
+						url='./handle.php';
+						vid=$("#vid").val();
+						parameter='?type=searchVideo&vid='+vid;
+						req.onreadystatechange = function(){
+								if(req.readyState==4){
+										//$("#video").html();
+										tmp=req.responseText;
+										try {
+												obj = JSON.parse(tmp);
+												console.log(tmp);
+										} 
+										catch (e) {
+												clearDiv("#message");
+												console.log(tmp);
+												return false;
+										}
+										if(tmp=='null'){
+												alert("NOT IN DB");
+												$("#title").val('');
+												$("#content").val('');
+												$("#category").val('');
+												$("#duration").val('');
+												$("#author").val('');
+												$("#keyword").val('');
 
-	
+
+												return;
+										}
+										$("#title").val(obj.title);
+										$("#content").val(obj.content);
+										$("#category").val(obj.category);
+										$("#duration").val(obj.duration);
+										$("#author").val(obj.author);
+										$("#keyword").val(obj.keyword);
+								}
+						};
+				}
+				else {
+						console.log("getData wrong");
+				}
+
+
 				req.open("GET", url+parameter, true);
 				req.send();
 		}
@@ -167,7 +218,7 @@ function getPostData(method,data) {
 						req.onreadystatechange = processSearchReqChange;
 						$("#message").html('searching...');
 						parameter="search="+$("#search").val()+"&sortField="+$("#order").val()+"&method="+db;
-						parameter+='&category='+$("#category").val();
+						parameter+='&category='+$("#c_category").val();
 						clearDiv("all");
 						//console.log(parameter);
 						start = new Date().getTime();
@@ -181,6 +232,7 @@ function getPostData(method,data) {
 						}
 						else{
 								parameter+="&message="+$("#comment").val();
+								$("#comment").val('');
 						}
 				}
 				else if(method=='test'){
@@ -253,10 +305,12 @@ function processCommentReqChange(){
 				for(var i = 0; i < obj.length; i++) {
 						commentHtmlCode+='<div class="comment">';
 						commentHtmlCode+='<span class="name">'+obj[i].name+'</span>';
-						commentHtmlCode+='<span class="date">'+obj[i].time+'</span>'; 
-						commentHtmlCode+='<button class="btn btn-warning" onclick="var datac=new Object();datac.cid=\''+obj[i].cid;
-						commentHtmlCode+='\';datac.vid=\''+obj[i].vid+'\';httpGetRequest(\'deleteComment\',datac';
-						commentHtmlCode+=')">'+'delete'+'</button>'; 
+						commentHtmlCode+='<span class="date">'+obj[i].time+'</span>';
+						if(uid==obj[i].uid){
+								commentHtmlCode+='<button class="btn btn-warning" onclick="var datac=new Object();datac.cid=\''+obj[i].cid;
+								commentHtmlCode+='\';datac.vid=\''+obj[i].vid+'\';httpGetRequest(\'deleteComment\',datac';
+								commentHtmlCode+=')">'+'delete'+'</button>';
+						}
 						commentHtmlCode+='<div class="content">'+obj[i].content+'</div>';
 						commentHtmlCode+='</div>';
 
@@ -275,6 +329,9 @@ function parseJsonToList(message,obj){
 				if(obj[i].published){//should *1000,because wrong in put data to db
 						time = new Date(obj[i].published.sec * 1000000);
 						obj[i].published=time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
+				}
+				else{
+						obj[i].published = mongoIDToDate(obj[i]._id.$id);
 				}
 				//obj[i].published=time;
 				
@@ -331,9 +388,10 @@ function playvideo(video){
 	
 		htmlcode+='</div><div class="content">';
 		htmlcode+=videoJson.content+'</div><table class="infoTable"><tr><td>published</td><td>';
-		htmlcode+=videoJson.published+'</td></tr><tr><td>category</td><td>'+videoJson.category+'</td></tr></table>';
+		htmlcode+=videoJson.published+'</td></tr><tr><td>category</td><td>'+videoJson.category;
+		htmlcode+='</td></tr></table></div>';
 		/*comment post form*/
-		htmlcode+='<input type="text" id="comment" name="comment" placeholder="comment"></input>';
+		htmlcode+='<div><input type="text" id="comment" name="comment" placeholder="comment"></input>';
 		htmlcode+='<input type="button" onClick="getPostData(\'comment\',\''+videoJson.vid+'\')" value="comment"/>';
 		if($("#relationVideo").html() == "" )$("#relationVideo").html($("#video").html());//TODO relationvideo list
 		$("#video").html('');
@@ -383,6 +441,11 @@ function setUserInfo(){
 
 
 }
+function mongoIDToDate(objID){
+		time = new Date( parseInt(objID.substring(0,8) , 16) *1000 );
+//		return time.toTimeString();
+		return time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
+}
 </script>
 </head>
 <body>
@@ -397,7 +460,7 @@ function setUserInfo(){
 <li><a onClick="showList('history')">History List</a></li>
 <li><a onClick="showList('upload')">Upload List</a></li>
 <li><a onClick="showList('favorite')">Favorite List</a></li>
-<li><a onClick="showList('like')">like List</a></li>
+<li><a onClick="getData('getPage','./manage.html')">manage video</a></li>
 <li><a onClick="showList('comment')">comment List</a></li>
 <li class="divider"></li>
 <li><a href="./handle.php?type=logout">Logout</a></li>
@@ -418,7 +481,7 @@ function setUserInfo(){
 		<option VALUE="duration">Duration</option>
 		</select>
 		
-		<select name="category" id="category"> 
+		<select name="c_category" id="c_category"> 
 		<option value="" selected="selected">--category--</option>
 		<option value="Animals">Animals</option>
 		<option value="Autos">Autos</option>

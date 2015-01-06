@@ -7,7 +7,7 @@ db.record.find({$or:[{content:/.*video by M.*/},{title:/.*PSY.*/}]});
 tags
 db.test.findOne({tags:{$in:["banana","haha"]}})
 db.test.update(  { _id: XXX }, { $addToSet: { tags: "accessories" } }   )
-db.lastTagDB.update({tags:"music"},{ $inc:{count:1}, $set:{ tags:"music"} },{upsert:true}    )
+db.lastTagDB.update({tags:"Music"},{ $inc:{count:1}, $set:{ tags:"Music"} },{upsert:true}    )
 
 search
 db.record.aggregate([{$match:{$and:{ {$text:{$search:"psy"}},{"category":"Music"} } }  },{$limit:5}])

@@ -1,7 +1,6 @@
 <!DOCTYPE>
 <html>
 <head>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js"/>
 <script>
 /*function submit() {
 		$("#info").submit();
@@ -48,24 +47,43 @@ function processReqChange(){
 </script>
 </head>
 <body>
-<form method="post" name="info" id="info" action="manage.php">
-<select name="type" id="type">
+<form method="get" name="info" id="videoManage" action="handle.php">
+<input type="hidden" name="type" value="manageVideo">
+<select name="operation" id="operation">
 <option value="insert" selected="selected">insert</option>
 <option value="update">update</option>
 <option value="delete">delete</option>
 </select>
-<input type="text" id="id" name="id" placeholder="id"></input><br/>
+<button type="button" onClick="getData('findByID')">findID</button>
+<br/>
+<input type="text" id="vid" name="vid" placeholder="video id"></input><br/>
 <input type="text" id="title" name="title" placeholder="title"></input><br/>
-<input type="text" id="published" name="published" placeholder="published"></input><br/>
 <input type="text" id="content" name="content" placeholder="content"></input><br/>
-<input type="text" id="category" name="category" placeholder="category"></input><br/>
+<select name="category" id="category">
+<option value="" selected="selected">--category--</option>
+<option value="Animals">Animals</option>
+<option value="Autos">Autos</option>
+<option value="Comedy">Comedy</option>
+<option value="Education">Education</option>
+<option value="Entertainment">Entertainment</option>
+<option value="Film">Film</option>
+<option value="Games">Games</option>
+<option value="Howto">Howto</option>
+<option value="Movies">Movies</option>
+<option value="Music">Music</option>
+<option value="News">News</option>
+<option value="Nonprofit">Nonprofit</option>
+<option value="People">People</option>
+<option value="Sports">Sports</option>
+<option value="Shows">Shows</option>
+<option value="Tech">Tech</option>
+<option value="Trailers">Trailers</option>
+<option value="Travel">Travel</option>
+</select><br/>
 <input type="text" id="duration" name="duration" placeholder="duration"></input><br/>
-<input type="text" id="favoriteCount" name="favoriteCount" placeholder="favoriteCount"></input><br/>
-<input type="text" id="viewCount" name="viewCount" placeholder="viewCount"></input><br/>
 <input type="text" id="author" name="author" placeholder="author"></input><br/>
 <input type="text" id="keyword" name="keyword" placeholder="keyword"></input><br/>
-<input type="text" id="uid" name="uid" placeholder="uid"></input><br/>
-<input type="button" onClick="submit()" value="search"/>
+<button type="button" onClick="submitt()" value="search">submit</button>
 </form>
 
 <script>
@@ -76,25 +94,25 @@ $("#type").change(function(){
 		$("#info input").attr('disabled',false);
 		}
 		else if($(this).val() == 'update'){
-		$("#id").attr('disabled',false);
+		$("#vid").attr('disabled',false);
 		$("#title").attr('disabled',false);
-		$("#published").attr('disabled',true);
 		$("#content").attr('disabled',false);
 		$("#category").attr('disabled',false);
 		$("#duration").attr('disabled',false);
-		$("#favoriteCount").attr('disabled',true);
-		$("#viewCount").attr('disabled',true);
 		$("#author").attr('disabled',false);
 		$("#keyword").attr('disabled',false);
-		$("#uid").attr('disabled',true);
 		}
 		else{
 		$("#info input").attr('disabled',true);
-		$("#id").attr('disabled',false);
+		$("#vid").attr('disabled',false);
 		}
-		$("#id").val(str);
-}
+		$("#vid").val(str);
+		}
 ).change;
+function submitt(){
+		$("#videoManage").submit();
+		return false;
+}
 </script>
 
 
