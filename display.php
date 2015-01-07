@@ -89,6 +89,7 @@ function httpGetRequest(method,data) {
 }
 function getData(method,data) {
 		req = false;
+		var url='';
 		if(window.XMLHttpRequest) {
 				try { req = new XMLHttpRequest();
 				} catch(e) {
@@ -111,7 +112,7 @@ function getData(method,data) {
 				else if(method=='comment'){
 						url = 'handle.php';
 						req.onreadystatechange = processCommentReqChange;
-						parameter="type=comment&vid="+data.vid;
+						parameter="?type=comment&vid="+data.vid;
 						if($("#comment").val() ==''){
 						}
 						else{
@@ -147,6 +148,12 @@ function getData(method,data) {
 										$("#video").html(req.responseText);
 								}
 						}
+				}
+				else if(method=='playVideo'){
+						url='./handle.php';
+						vid=data;
+						parameter='?type=searchVideo&vid='+vid;
+						req.onreadystatechange = playvideo;
 				}
 				else if(method=='findByID'){
 						url='./handle.php';
@@ -200,6 +207,7 @@ function getData(method,data) {
 function getPostData(method,data) {
 		//url = 'http://140.123.101.185:5182/~tan/data/youtube/search.php';
 		//url = 'search.php';
+		var url='';
 		req = false;
 		if(window.XMLHttpRequest) {
 				try { req = new XMLHttpRequest();
@@ -227,7 +235,7 @@ function getPostData(method,data) {
 						url = 'handle.php';
 						req.onreadystatechange = processCommentReqChange;
 						parameter="type=comment&vid="+data;
-						console.log(url+parameter);
+						console.log(url+'|||'+parameter);
 						if($("#comment").val() ==''){
 						}
 						else{
@@ -336,7 +344,7 @@ function parseJsonToList(message,obj){
 				//obj[i].published=time;
 				
 				/**/
-				innerstring+='<div class="videoList" id="'+obj[i].vid+'" onClick="playvideo(this)">';
+				innerstring+='<div class="videoList" id="'+obj[i].vid+'" onClick="getData(\'playVideo\',\''+obj[i].vid+'\')">';
 				innerstring+='<img id="'+obj[i].vid+'"src="http://i.ytimg.com/vi/'+obj[i].vid;
 				innerstring+='/mqdefault.jpg" onerror="imgError(this)"/>';
 				innerstring+='<div class="info">';
@@ -357,51 +365,72 @@ function parseJsonToList(message,obj){
 		//console.log("###!"+$("#"+obj[0].vid+" .jsondata").text());
 
 }
-function playvideo(video){
-		tmp = video.getElementsByClassName('jsondata')[0].innerHTML;
-		videoJson=JSON.parse(tmp);
-		$("#message").html('');
-//		$("#message").css({"font-size":"1.1em","font-weight":"bolder"});
-		htmlcode='';
-		/*video*/
-		iframeWidth=Math.floor(($(window).width()*6/10)-5);
-		htmlcode='<iframe width="'+iframeWidth+'" height="'+Math.floor((iframeWidth*0.56));
-		htmlcode+='" src="//www.youtube.com/embed/'+videoJson.vid;
-		htmlcode+='" frameborder="0" allowfullscreen></iframe>';
-		htmlcode+='<div class="title">'+videoJson.title+'</div>';
-		htmlcode+='<div class="author">Author : '+videoJson.author+'</div><div class="infoRow">';
-		htmlcode+='<div class="viewCount">views : '+videoJson.viewCount+'</div>';
-		
-//		htmlcode+='<div  class="favoriteCount">likes : '+videoJson.favoriteCount+'</div>';
+function playvideo(){
+		if(req.readyState==4){
+				commentHtmlCode='';
+				tmp = req.responseText;
+				try{
+						obj = JSON.parse(tmp);
+						console.log(tmp);
+				}catch (e){
+						console.log('fail on processCommentReqChange');
+						console.log(tmp);
+						return false;
+				}
 
-		htmlcode+='<div id="likeSetting" class="btn-group favoriteCount">';
-		htmlcode+='<a class="btn btn-info" id="likes" onclick="httpGetRequest(\'like\')">';
-		htmlcode+='<img class="icon" src="image/like.png"/> ';
-		htmlcode+=videoJson.favoriteCount+'</a>';
-		htmlcode+='<a class="btn btn-info" id="dislikes" onclick="httpGetRequest(\'dislike\')">';
-		if(!videoJson.dislike){
-				videoJson.dislike=0;
+				//tmp = video.getElementsByClassName('jsondata')[0].innerHTML;
+				videoJson=obj;
+				$("#message").html('');
+				//		$("#message").css({"font-size":"1.1em","font-weight":"bolder"});
+				htmlcode='';
+				/*video*/
+				iframeWidth=Math.floor(($(window).width()*6/10)-5);
+				htmlcode='<iframe width="'+iframeWidth+'" height="'+Math.floor((iframeWidth*0.56));
+				htmlcode+='" src="//www.youtube.com/embed/'+videoJson.vid;
+				htmlcode+='" frameborder="0" allowfullscreen></iframe>';
+				htmlcode+='<div class="title">'+videoJson.title+'</div>';
+				htmlcode+='<div class="author">Author : '+videoJson.author+'</div><div class="infoRow">';
+				htmlcode+='<div class="viewCount">views : '+videoJson.viewCount+'</div>';
+
+				//		htmlcode+='<div  class="favoriteCount">likes : '+videoJson.favoriteCount+'</div>';
+
+				htmlcode+='<div id="likeSetting" class="btn-group favoriteCount">';
+				htmlcode+='<a class="btn btn-info" id="likes" onclick="httpGetRequest(\'like\')">';
+				htmlcode+='<img class="icon" src="image/like.png"/> ';
+				htmlcode+=videoJson.favoriteCount+'</a>';
+				htmlcode+='<a class="btn btn-info" id="dislikes" onclick="httpGetRequest(\'dislike\')">';
+				if(!videoJson.dislike){
+						videoJson.dislike=0;
+				}
+				htmlcode+='<img class="icon" src="image/dislike.png"> '+videoJson.dislike+'</a>';
+				htmlcode+='<a onClick="video.vid=\''+videoJson.vid+'\';httpGetRequest(\'favorite\',video)" class="btn btn-info"><img class="icon" src="image/star.png"/></a>';
+				htmlcode+='</div>';
+
+				htmlcode+='</div><div class="content">';
+				
+				if(videoJson.published){//should *1000,because wrong in put data to db
+						time = new Date(videoJson.published.sec * 1000000);
+						videoJson.published=time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
+				}
+				else{
+						videoJson.published = mongoIDToDate(videoJson._id.$id);
+				}
+
+				htmlcode+=videoJson.content+'</div><table class="infoTable"><tr><td>published</td><td>';
+				htmlcode+=videoJson.published+'</td></tr><tr><td>category</td><td>'+videoJson.category;
+				htmlcode+='</td></tr></table></div>';
+				/*comment post form*/
+				htmlcode+='<div><input type="text" id="comment" name="comment" placeholder="comment"></input>';
+				htmlcode+='<input type="button" onClick="getPostData(\'comment\',\''+videoJson.vid+'\')" value="comment"/>';
+				if($("#relationVideo").html() == "" )$("#relationVideo").html($("#video").html());//TODO relationvideo list
+				$("#video").html('');
+				$("#videoPlay").html(htmlcode);
+
+				//set history
+				videoJson.which = "history";
+				httpGetRequest("addToList",videoJson);
+				getPostData('comment',videoJson.vid);
 		}
-		htmlcode+='<img class="icon" src="image/dislike.png"> '+videoJson.dislike+'</a>';
-		htmlcode+='<a onClick="video.vid=\''+videoJson.vid+'\';httpGetRequest(\'favorite\',video)" class="btn btn-info"><img class="icon" src="image/star.png"/></a>';
-		htmlcode+='</div>';
-	
-		htmlcode+='</div><div class="content">';
-		htmlcode+=videoJson.content+'</div><table class="infoTable"><tr><td>published</td><td>';
-		htmlcode+=videoJson.published+'</td></tr><tr><td>category</td><td>'+videoJson.category;
-		htmlcode+='</td></tr></table></div>';
-		/*comment post form*/
-		htmlcode+='<div><input type="text" id="comment" name="comment" placeholder="comment"></input>';
-		htmlcode+='<input type="button" onClick="getPostData(\'comment\',\''+videoJson.vid+'\')" value="comment"/>';
-		if($("#relationVideo").html() == "" )$("#relationVideo").html($("#video").html());//TODO relationvideo list
-		$("#video").html('');
-		$("#videoPlay").html(htmlcode);
-		
-		//set history
-		videoJson.which = "history";
-		httpGetRequest("addToList",videoJson);
-
-		getPostData('comment',videoJson.vid);
 		return;
 }
 function showList(listname){
