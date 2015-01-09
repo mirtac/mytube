@@ -155,28 +155,50 @@ elseif (count($_GET>0)){
 		$type = $_GET['type'];
 		if(isset($_SESSION['uid'])){
 		}
-		else return false;
-		if ($type=='mlike'){//NOT USE
-				$link = mysql_connect('localhost', 's499410039','sql321'); 
-				if(!$link) { 
-						die('Could not connect(112): ' . mysql_error()); 
-				} 
-				mysql_select_db("s499410039", $link);
-
-				$queryString="select * from malike where mid=$mid&&aid=$aid";
-				echo $queryString;
-				$result = mysql_query($queryString);
-				$datacount = mysql_num_rows($result);
-				if($datacount!=0);
-				else {
-						$like=$like+1;
-						$queryString="insert into malike (mid,aid) values($mid,$aid)";
-						$result = mysql_query($queryString);
-						//echo $queryString;
-						$queryString="update message set plike=$like where mid=$mid";
-						//echo $queryString;
-						$result = mysql_query($queryString);
+		else {
+				echo 'need to login';
+				return false;
+		}
+		if ($type=='videoLike'){//TODO
+				$db = mongoConnect();
+				$which=$_GET['which'];
+				if($which=='like'){//TODO
+						$which = 'likeDB';
+						$like='favoriteCount';
 				}
+				elseif($which=='dislike'){
+						$which = 'dislikeDB';
+						$like='dislike';
+				}
+				else{
+						echo "which:$which";
+						return false;
+				}
+
+				$collection=$db->selectCollection($which);
+				$loginQuery = [ 'uid' => $_SESSION['uid']   ] ;
+				//db.likeDB.insert({'uid':$uid,'vid':$vid});
+				$ops = [ 'uid'=> $_SESSION['uid'] , 'vid' => $_GET['vid']    ];
+				try{
+						$result= $collection->insert($ops);
+						$collection=$db->selectCollection($videoDB);
+						//db.test.update({vid:$vid)},{ $inc:{$like:1} } ,{upsert:true}    )
+						$result = $collection->update(
+								['vid' => $_GET['vid'] ],
+								[
+									'$inc' => [ $like => 1 ]
+								],
+								[ 'upsert' => 1]);
+						$result = $collection->findOne( [ 'vid' => $_GET['vid']]  );
+					
+				}
+				catch(Exception $e){
+						echo 'fail';
+						return false;
+				}
+				echo json_encode($result);
+
+
 
 		}
 		elseif ($type=='clike'){//NOT USE

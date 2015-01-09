@@ -9,6 +9,10 @@ db.test.findOne({tags:{$in:["banana","haha"]}})
 db.test.update(  { _id: XXX }, { $addToSet: { tags: "accessories" } }   )
 db.lastTagDB.update({tags:"Music"},{ $inc:{count:1}, $set:{ tags:"Music"} },{upsert:true}    )
 
+likes/dislike
+db.test.update({"_id" : ObjectId("546df00c26b91b907b251c8e")},{ $inc:{favoriteCount:1}},{upsert:true}    )
+db.test.update({"vid":"u9emjalsOsE"},{ $inc:{favoriteCount:1}},{upsert:true}    )
+
 search
 db.record.aggregate([{$match:{$and:{ {$text:{$search:"psy"}},{"category":"Music"} } }  },{$limit:5}])
 db.test.aggregate([{$match:{$text:{$search:"psy"}}}])

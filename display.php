@@ -44,6 +44,7 @@ function clearDiv(){
 		}
 }
 function httpGetRequest(method,data) {
+		var url='';
 		req = false;
 		if(window.XMLHttpRequest) {
 				try { req = new XMLHttpRequest();
@@ -69,11 +70,9 @@ function httpGetRequest(method,data) {
 						title=$("#"+data.vid+" .info .title").html();
 						url+="&which=favorite"+"&vid="+data.vid+"&title="+title;
 				}
-				else if(method=='like'||method=='dislike'){//TODO
-				}
 				else if(method=='deleteComment'){
 						url = 'handle.php?type=deleteComment';
-						url+="&cid="+data.cid+"&vid="+data.vid;//TODO vid
+						url+="&cid="+data.cid+"&vid="+data.vid;
 						req.onreadystatechange = processCommentReqChange;
 						console.log(url);
 
@@ -90,6 +89,7 @@ function httpGetRequest(method,data) {
 function getData(method,data) {
 		req = false;
 		var url='';
+		var parameter='';
 		if(window.XMLHttpRequest) {
 				try { req = new XMLHttpRequest();
 				} catch(e) {
@@ -193,11 +193,34 @@ function getData(method,data) {
 								}
 						};
 				}
+				else if(method=='like'||method=='dislike'){
+						url = 'handle.php?type=videoLike';
+						url+="&vid="+data+"&which="+method;
+						req.onreadystatechange = function(){
+								if(req.readyState==4){
+										//TODO if fail:disable button;else update likecount;
+										tmp=req.responseText;
+										try {
+												obj = JSON.parse(tmp);
+												$("#likeNum").html(obj.favoriteCount);
+												if(obj.dislike){
+														$("#dislikeNum").html(obj.dislike);
+												}else{
+														$("#dislikeNum").html('0');
+												}
+										} 
+										catch (e) {
+												console.log("like fail"+tmp);
+												return false;
+										}
+								}
+						}
+				}
 				else {
 						console.log("getData wrong");
 				}
 
-
+				console.log(url+parameter+"||");
 				req.open("GET", url+parameter, true);
 				req.send();
 		}
@@ -395,14 +418,14 @@ function playvideo(){
 				//		htmlcode+='<div  class="favoriteCount">likes : '+videoJson.favoriteCount+'</div>';
 
 				htmlcode+='<div id="likeSetting" class="btn-group favoriteCount">';
-				htmlcode+='<a class="btn btn-info" id="likes" onclick="httpGetRequest(\'like\')">';
+				htmlcode+='<a class="btn btn-info" id="likes" onclick="getData(\'like\',\''+videoJson.vid+'\')">';
 				htmlcode+='<img class="icon" src="image/like.png"/> ';
-				htmlcode+=videoJson.favoriteCount+'</a>';
-				htmlcode+='<a class="btn btn-info" id="dislikes" onclick="httpGetRequest(\'dislike\')">';
+				htmlcode+='<span id="likeNum">'+videoJson.favoriteCount+'</span></a>';
+				htmlcode+='<a class="btn btn-info" id="dislikes" onclick="getData(\'dislike\',\''+videoJson.vid+'\')">';
 				if(!videoJson.dislike){
 						videoJson.dislike=0;
 				}
-				htmlcode+='<img class="icon" src="image/dislike.png"> '+videoJson.dislike+'</a>';
+				htmlcode+='<img class="icon" src="image/dislike.png"><span id="dislikeNum">'+videoJson.dislike+'</span></a>';
 				htmlcode+='<a onClick="video.vid=\''+videoJson.vid+'\';httpGetRequest(\'favorite\',video)" class="btn btn-info"><img class="icon" src="image/star.png"/></a>';
 				htmlcode+='</div>';
 
@@ -470,7 +493,7 @@ function setUserInfo(){
 
 
 }
-function mongoIDToDate(objID){
+function mongoIDToDate(objID){//return YYYY/MM/DD
 		time = new Date( parseInt(objID.substring(0,8) , 16) *1000 );
 //		return time.toTimeString();
 		return time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
@@ -489,7 +512,7 @@ function mongoIDToDate(objID){
 <li><a onClick="showList('history')">History List</a></li>
 <li><a onClick="showList('upload')">Upload List</a></li>
 <li><a onClick="showList('favorite')">Favorite List</a></li>
-<li><a onClick="getData('getPage','./manage.html')">manage video</a></li>
+<li><a onClick="getData('getPage','./manage.html');$('#userbtn').attr('class','btn-group');">manage video</a></li>
 <li><a onClick="showList('comment')">comment List</a></li>
 <li class="divider"></li>
 <li><a href="./handle.php?type=logout">Logout</a></li>
