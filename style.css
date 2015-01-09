@@ -61,6 +61,7 @@ margin-left:auto;
 height:100px;
 width:100%;
 //height:150px;
+max-width: 500px;
 }
 .videoList img{
 float:left;
