@@ -83,8 +83,8 @@ function mysqlSearch(){
 function mongoSearch(){
 		$db = mongoConnect();
 //		$collection = $db->test;
-		$videoDB='test';
-		//$videoDB='record';
+		//$videoDB='test';
+		$videoDB='record';
 		$collection=$db->selectCollection("$videoDB");
 		//$collection=db->record;
 		$searchphrase = $_POST['search'];
@@ -94,13 +94,10 @@ function mongoSearch(){
 						$page = $_POST['page'];
 				}
 		}
-		$sortField='viewCount';
-		if(isset($_POST['sortField'])){
-				if( $_POST['sortField'] != ''){
-						$sortField = $_POST['sortField'];
-				}
-		}
+		$sortField='_id';
+		//$sortField='viewCount';
 		$limitCount=$page * 20;
+		$limitCount=500;
 		$skipCount=($page -1) * 20;
 		//$regex = new MongoRegex('/.*'.$searchphrase.'.*/i');
 		$ops = array(
@@ -110,36 +107,53 @@ function mongoSearch(){
 													'$search' => $searchphrase
 											)
 										)
-							 ),
-						array(
-								'$sort' => array(
-										$sortField	=> -1 
-										)
-						),
-						array(
-								'$limit' => $limitCount
+		//					 ),
+		//				array(
+		//						'$sort' => array(
+		//								$sortField	=> -1 
+		//								)
+		//				),
+		//				array(
+		//						'$limit' => $limitCount
 							 ),
 						array(
 								'$skip' => $skipCount
 						)
 				);
 		$res = $ops;
+		$i=1;
 		if(isset($_POST['category'])){
 				if($_POST['category'] != ""){
 						$category=$_POST['category'];
-						$res = array_slice($ops, 0, 1) +
-						array ( 1 => array('$match' => array( 'category' => $category))) +
-						array_slice($ops, 1, count($ops) - 1) ;
+						$res = array_merge($res ,
+						[array('$match' => array( 'category' => $category) )] );
+				//		array_slice($ops, $i, count($ops) - 1) ) ;
 						}
 		}
+		if(isset($_POST['sortField'])){
+				if($_POST['sortField'] != ""){
+						$sortField=$_POST['sortField'];
+						$res = array_merge($res ,
+						[array('$sort' => [ $sortField => -1]  )]   ) ;
+						}
+		}
+		$res = array_merge($res , [['$limit' => $limitCount]]);
 		//$result= $collection->aggregate($ops);
-		$result= $collection->aggregate($res);
-		//		$result->timeout(-1);
+		$options=[ 'cursor' => [ 'batchSize' => 0 ]];
+		//$result= $collection->aggregate($ops,$options);
+//		$result= $collection->aggregate([ ['$match'=>['$text' =>['$search'=>$searchphrase]]],['$limit' => $limitCount]],$options);
+		$result= $db->command(['aggregate'=>$videoDB,'pipeline'=>$res],['timeout'=>60000000]);
+		//$result->timeout(-1);
 /*		foreach($result as $k => $row){
 				echo json_encode($row);
 				break;
 		}*/
-		echo json_encode($result['result']);
+		if(isset($result['result'])){
+				echo json_encode($result['result']);
+		}
+		else {
+				var_dump($result);
+		}
 		//echo json_encode($result);
 		//echo $result['result'][0]['_id']->{'$id'};
 		//$a="";
