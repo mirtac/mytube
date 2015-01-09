@@ -74,7 +74,6 @@ function httpGetRequest(method,data) {
 						url = 'handle.php?type=deleteComment';
 						url+="&cid="+data.cid+"&vid="+data.vid;
 						req.onreadystatechange = processCommentReqChange;
-						console.log(url);
 
 				}
 				else {
@@ -165,7 +164,6 @@ function getData(method,data) {
 										tmp=req.responseText;
 										try {
 												obj = JSON.parse(tmp);
-												console.log(tmp);
 										} 
 										catch (e) {
 												clearDiv("#message");
@@ -220,7 +218,6 @@ function getData(method,data) {
 						console.log("getData wrong");
 				}
 
-				console.log(url+parameter+"||");
 				req.open("GET", url+parameter, true);
 				req.send();
 		}
@@ -258,7 +255,6 @@ function getPostData(method,data) {
 						url = 'handle.php';
 						req.onreadystatechange = processCommentReqChange;
 						parameter="type=comment&vid="+data;
-						console.log(url+'|||'+parameter);
 						if($("#comment").val() ==''){
 						}
 						else{
@@ -327,7 +323,6 @@ function processCommentReqChange(){
 				tmp = req.responseText;
 				try{
 						obj = JSON.parse(tmp);
-						console.log(tmp);
 				}catch (e){
 						console.log('fail on processCommentReqChange');
 						console.log(tmp);
@@ -355,7 +350,8 @@ function parseJsonToList(message,obj){
 		if(message!=""){
 				$("#message").html(message);
 		}
-		for(var i = 0; i < obj.length; i++) {
+		//for(var i = 0; i < obj.length; i++) {
+		for(var i = 0; i < 20; i++) {
 				/*date transfer*/
 				if(obj[i].published){//should *1000,because wrong in put data to db
 						time = new Date(obj[i].published.sec * 1000000);
@@ -394,7 +390,6 @@ function playvideo(){
 				tmp = req.responseText;
 				try{
 						obj = JSON.parse(tmp);
-						console.log(tmp);
 				}catch (e){
 						console.log('fail on processCommentReqChange');
 						console.log(tmp);
