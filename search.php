@@ -194,85 +194,17 @@ function mongoSearch(){
 		echo "]";
 }
 
-function mongoSearchG(){
+function mongoCategorySearch(){
 		$db = mongoConnect();
-		$videoDB='test';
-		//$videoDB='record';
-		$collection=$db->selectCollection("$videoDB");
-		$searchphrase = $_GET['search'];
-		$orderby = $_GET['order'];
-		$page=1;
-		if(isset($_GET['page'])){
-				if($page >= 1 ){
-						$page = $_GET['page'];
-				}
-		}
-		$sortField='viewCount';
-		if(isset($_GET['sortField'])){
-				$sortField = $_GET['sortField'];
-		}
-		$limitCount=$page * 20;
-		$skipCount=($page -1) * 20;
-		//$regex = new MongoRegex('/.*'.$searchphrase.'.*/i');
-		$ops = array(
-						array(
-								'$match' => array(
-											'$text' => array(
-													'$search' => $searchphrase
-											)
-										)
-							 ),
-						array(
-								'$sort' => array(
-										$sortField => -1
-										)
-						),
-						array(
-								'$limit' => $limitCount
-							 ),
-						array(
-								'$skip' => $skipCount
-						)
-				);
-		if(isset($_GET['category'])){
-				$category=$_GET['category'];
-				$res = array_slice($ops, 0, 1) +
-						array ( 1 => array('$match' => array( 'category' => $category))) +
-						array_slice($ops, 1, count($ops) - 1) ;
-		}
-		else{
-				$res = $ops;
-		}
-		//$result= $collection->aggregate($ops);
-		$result= $collection->aggregate($res);
-		//		$result->timeout(-1);
-/*		foreach($result as $k => $row){
-				echo json_encode($row);
-				break;
-		}*/
-		echo json_encode($result['result']);
-		//echo $result['result'][0]['_id']->{'$id'};
-		//$a="";
-		//$a=$result['result'][0]['_id'];
-		//echo date('Y-m-d',$a->getTimestamp());
-		//var_dump($a);
-//		var_dump($result['result'][0]['_id']);
-		//var_dump($result);
-//		echo count($result['result']);
-		return;	
-
-/**/
-//		$sort[] = array($orderby => -1);
-//		$regex = new MongoRegex('/.*'.$searchphrase.'.*/i');
-/*		$findQuery = array( '$or' => array( array('content' => $regex), array('title' =>   $regex ) ) );
-		if($orderby==""){
-				$result = $collection->find($findQuery);
-		}
-		else{
-				$result = $collection->find($findQuery)->sort($sort);
-		}
-*/
-/**/
+		//$videoDB='test';
+		$videoDB='record';
+		$collection=$db->selectCollection($videoDB);
+		$category = $_GET['category'];
+		$orderby = 'viewCount';
+		$sort = [$orderby => -1];
+		//db.record.find({category:"Music"}).sort({viewCount:-1})
+		$findQuery = [ 'category' => $category];
+		$result = $collection->find($findQuery)->sort($sort)->limit(20);
 		$result->timeout(-1);
 		$notFirst=false;
 		echo "[";
@@ -301,7 +233,9 @@ if(isset($_POST['method'])){
 				mongoSearch();
 		}
 }
-else{
+elseif(isset($_GET['category'])){
+		mongoCategorySearch();
+}else{
 		echo "should use post!";
 }
 ?>
