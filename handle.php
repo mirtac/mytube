@@ -279,6 +279,7 @@ elseif (count($_GET>0)){
 				$skipCount=0;
 				$which = $_GET['which'];
 				//TODO check whether isSet ($_GET)[$which,$title,$vid]
+
 				if($which=='history'||$which=='upload' || $which=='favorite'){
 						$which .= 'ListDB';
 				}
@@ -287,6 +288,21 @@ elseif (count($_GET>0)){
 						return;
 				}
 				$db = mongoConnect();
+				if($which=='historyListDB'){
+						$collection=$db->selectCollection($videoDB);
+						//db.test.update({vid:$vid)},{ $inc:{$like:1} } ,{upsert:true}    )
+						try{
+								$result = $collection->update(
+												['vid' => $_GET['vid'] ],
+												[
+												'$inc' => [ 'viewCount' => 1 ]
+												],
+												[ 'upsert' => 1]);
+						}catch(Exception $e){
+								echo 'already';
+						}
+
+				}
 				$collection=$db->selectCollection($which);
 						
 				$title = $_GET['title'];
