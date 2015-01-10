@@ -360,7 +360,8 @@ function parseJsonToList(message,obj){
 				$("#message").html(message);
 		}
 		//for(var i = 0; i < obj.length; i++) {
-		for(var i = 0; i < 20&&i<obj.length; i++) {
+		count=0;
+		for(var i = 0; i < 20&&i<obj.length; i++,count++) {
 				/*date transfer*/
 				try{//should *1000,because wrong in put data to db
 						time = new Date(obj[i].published.sec * 1000000);
@@ -403,12 +404,15 @@ function parseJsonToList(message,obj){
 		}
 		if(obj.length==0){
 				innerstring='<div style="text-align:center"><h2>no result</h2></div>';
+				$("#video").html(innerstring);
+				return;
 		}
 		$("#video").html(innerstring);
 		$(window).scroll(function () {
 				    if ($(document).scrollTop() + $(window).height() >= $(document).height()) {
 				    		innerstring='';
 				    		tmpCount=count;
+				    if(count<20)return;
 					for(var i = count; i < (tmpCount+20)&&i<obj.length; i++,count++) {
 					try{
 					time = new Date(obj[i].published.sec * 1000000);
@@ -467,6 +471,8 @@ function playvideo(){
 						return false;
 				}
 
+				obj.length=0;
+				count=0;
 				//tmp = video.getElementsByClassName('jsondata')[0].innerHTML;
 				$("#message").html('');
 				//		$("#message").css({"font-size":"1.1em","font-weight":"bolder"});
@@ -522,6 +528,10 @@ function playvideo(){
 		return;
 }
 function showList(listname){
+		try{
+				obj.length=0;
+		}catch(e){}
+		count=0;
 		$("#userbtn").attr('class','btn-group');
 		getData("getlist",listname);
 		return true;
