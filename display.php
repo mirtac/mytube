@@ -354,8 +354,12 @@ function processCommentReqChange(){
 				//console.log(commentHtmlCode);
 		}
 }
-function parseJsonToList(message,obj){
+function parseJsonToList(message,obj,where){
 		var innerstring='';
+		if(where){}
+		else{
+				where='#video';
+		}
 		if(message!=""){
 				$("#message").html(message);
 		}
@@ -404,10 +408,10 @@ function parseJsonToList(message,obj){
 		}
 		if(obj.length==0){
 				innerstring='<div style="text-align:center"><h2>no result</h2></div>';
-				$("#video").html(innerstring);
+				$(where).html(innerstring);
 				return;
 		}
-		$("#video").html(innerstring);
+		$(where).html(innerstring);
 		$(window).scroll(function () {
 				    if ($(document).scrollTop() + $(window).height() >= $(document).height()) {
 				    		innerstring='';
@@ -470,11 +474,49 @@ function playvideo(){
 						console.log(tmp);
 						return false;
 				}
+				/*if($("#relationVideo").html() == "" )
+						$("#relationVideo").html($("#video").html());//TODO relationvideo list*/
+				var url='';
+				reqC = false;
+				if(window.XMLHttpRequest) {
+						try { reqC = new XMLHttpRequest();
+						} catch(e) {
+								reqC = false; }
+				} else if(window.ActiveXObject) {
+						try { reqC = new ActiveXObject("Msxml2.XMLHTTP");
+						} catch(e) {
+								try { reqC = new ActiveXObject("Microsoft.XMLHTTP");
+								} catch(e) { reqC = false; } 
+						} 
+				}
+				if(reqC) {
+						url = 'search.php';
+						reqC.onreadystatechange = function(){
+								if(reqC.readyState==4){
+										console.log("in relationList parse");
+										tmp = reqC.responseText;
+										try{
+												relavideo = JSON.parse(tmp);
+										}catch (e){
+												console.log('fail on playvideo.relationList');
+												console.log(tmp);
+												return false;
+										}
+										parseJsonToList("",relavideo,'#relationVideo');
+								}
+						};
+						$("#message").html('searching...');
+						parameter='?method=search&category='+videoJson.category;
+						//console.log(parameter);
+						reqC.open("GET", url+parameter, true);
+						reqC.send();
+				}
+
 
 				obj.length=0;
 				count=0;
 				//tmp = video.getElementsByClassName('jsondata')[0].innerHTML;
-				$("#message").html('');
+//				$("#message").html('');
 				//		$("#message").css({"font-size":"1.1em","font-weight":"bolder"});
 				htmlcode='';
 				/*video*/
@@ -516,7 +558,6 @@ function playvideo(){
 				/*comment post form*/
 				htmlcode+='<div><input type="text" id="comment" name="comment" placeholder="comment"></input>';
 				htmlcode+='<input type="button" onClick="getPostData(\'comment\',\''+videoJson.vid+'\')" value="comment"/>';
-				if($("#relationVideo").html() == "" )$("#relationVideo").html($("#video").html());//TODO relationvideo list
 				$("#video").html('');
 				$("#videoPlay").html(htmlcode);
 
