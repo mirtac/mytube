@@ -140,11 +140,17 @@ function getData(method,data) {
 				}
 				else if(method=='getPage'){
 						clearDiv('all');
-						url = data;
+						url = data.page;
 						parameter='';
 						req.onreadystatechange = function(){
 								if(req.readyState==4){
 										$("#video").html(req.responseText);
+										if(data.vid){
+												$('#operation option[value='+data.mod+']').attr('selected','selected');
+												$('#vid').val(data.vid);
+												getData('findByID');
+										}
+
 								}
 						}
 				}
@@ -201,14 +207,15 @@ function getData(method,data) {
 										try {
 												obj = JSON.parse(tmp);
 												$("#likeNum").html(obj.favoriteCount);
-												if(obj.dislike){
+												try{
 														$("#dislikeNum").html(obj.dislike);
-												}else{
+												}catch( ev){
 														$("#dislikeNum").html('0');
 												}
 										} 
 										catch (e) {
 												console.log("like fail"+tmp);
+												$("#"+method+"Num").attr('disabled',true);
 												return false;
 										}
 								}
@@ -351,21 +358,22 @@ function parseJsonToList(message,obj){
 				$("#message").html(message);
 		}
 		//for(var i = 0; i < obj.length; i++) {
-		for(var i = 0; i < 20; i++) {
+		for(var i = 0; i < 20&&i<obj.length; i++) {
 				/*date transfer*/
-				if(obj[i].published){//should *1000,because wrong in put data to db
+				try{//should *1000,because wrong in put data to db
 						time = new Date(obj[i].published.sec * 1000000);
 						obj[i].published=time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
 				}
-				else{
+				catch( e){
 						obj[i].published = mongoIDToDate(obj[i]._id.$id);
 				}
 				//obj[i].published=time;
 				
 				/**/
-				innerstring+='<div class="videoList" id="'+obj[i].vid+'" onClick="getData(\'playVideo\',\''+obj[i].vid+'\')">';
+				innerstring+='<div class="videoList" id="'+obj[i].vid+'" >';
 				innerstring+='<img id="'+obj[i].vid+'"src="http://i.ytimg.com/vi/'+obj[i].vid;
-				innerstring+='/mqdefault.jpg" onerror="imgError(this)"/>';
+				innerstring+='/mqdefault.jpg" onerror="imgError(this)" '+
+						'onClick="getData(\'playVideo\',\''+obj[i].vid+'\')"/>';
 				innerstring+='<div class="info">';
 				innerstring+='<div class="title">'+obj[i].title+'</div>';
 				if(obj[i].published&&obj[i].author&&obj[i].duration&&obj[i].viewCount){
@@ -375,6 +383,21 @@ function parseJsonToList(message,obj){
 						innerstring+='<div class="viewCount">'+obj[i].viewCount+'</div>';
 				}
 				innerstring+='</div>';
+				if(obj[i].uid&&uid==obj[i].uid.$id&&$("#message").html()=='upload List'){
+						innerstring+='<span class="listEditor">'+
+							'<button class="btn-mini btn-info" '+
+							'onclick="var setOpt=new Object();setOpt.vid=\''+obj[i].vid+
+								'\';setOpt.page=\'./manage.html\';'+
+								'setOpt.mod=\'update\';getData(\'getPage\',setOpt);">'+
+								'<img class="icon" src="image/edit.png"/>'+'</button>'+
+							'<button class="btn-mini btn-danger" '+
+								'onclick="var setOpt=new Object();setOpt.vid=\''+obj[i].vid+
+								'\';setOpt.page=\'./manage.html\';'+
+								'setOpt.mod=\'delete\';getData(\'getPage\',setOpt);">'+
+							'<img class="icon" src="image/delete.png"/>'+
+							'</button></span>';
+				//htmlcode+='<a class="btn btn-info" id="likes" onclick="getData(\'like\',\''+videoJson.vid+'\')">';
+				}
 				innerstring+='<span class="jsondata">'+JSON.stringify(obj[i])+'</span></div>';
 		}
 		if(obj.length==0){
@@ -507,7 +530,7 @@ function mongoIDToDate(objID){//return YYYY/MM/DD
 <li><a onClick="showList('history')">History List</a></li>
 <li><a onClick="showList('upload')">Upload List</a></li>
 <li><a onClick="showList('favorite')">Favorite List</a></li>
-<li><a onClick="getData('getPage','./manage.html');$('#userbtn').attr('class','btn-group');">manage video</a></li>
+<li><a onClick="var setOpt=new Object();setOpt.page='./manage.html';getData('getPage',setOpt);$('#userbtn').attr('class','btn-group');">manage video</a></li>
 <li><a onClick="showList('comment')">comment List</a></li>
 <li class="divider"></li>
 <li><a href="./handle.php?type=logout">Logout</a></li>
