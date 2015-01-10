@@ -78,6 +78,12 @@ white-space: nowrap;
 .jsondata{
 visibility: hidden;
 }
+.listEditor{
+		position:absolute;
+		right:0px;
+		bottom:0px;
+		z-index:99;
+}
 .videoPlay {
 position:relative;
 width:60%;

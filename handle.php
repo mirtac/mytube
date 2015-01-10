@@ -38,8 +38,8 @@ function mongoConnect(){
 <body>
 <?php
 */
-//$videoDB = 'test';
-$videoDB = 'record';
+$videoDB = 'test';
+//$videoDB = 'record';
 if(count($_POST)>0){
 		//if(!strcmp($_POST["type"],"create")){
 		if($type=='create'){
@@ -354,7 +354,9 @@ elseif (count($_GET>0)){
 				if($_GET['operation']=='insert'){//TODO
 						$vid= $_GET['vid'];
 						$title = $_GET['title'];
+	$title=	iconv(mb_detect_encoding($title, mb_detect_order(), true), "UTF-8", $title);
 						$content = $_GET['content'];
+	$content=	iconv(mb_detect_encoding($content, mb_detect_order(), true), "UTF-8", $content);
 						$category = $_GET['category'];
 						$duration = $_GET['duration'];
 						$favoriteCount = 0;
@@ -367,13 +369,13 @@ elseif (count($_GET>0)){
 						$db = mongoConnect();
 						$collection=$db->selectCollection("$videoDB");
 						$result = $collection->find(array('vid' => $vid))->count();
-						//print_r($_GET);return;
-
+						print_r($_GET);
+try{
 
 						if($result==0){
 								$doc = [ "vid" => $vid , "title" => $title , "content" => $content ,
 								'category' => $category , 'duration' => $duration , 'favoriteCount' => $favoriteCount,
-								$viewCount => $viewCount , 'author' => $author , 'keyword' => $keyword
+								'viewCount' => $viewCount , 'author' => $author , 'keyword' => $keyword
 								, 'uid' => $uid , 'dislike' => $dislike];
 								$collection->insert($doc);
 								$collection=$db->selectCollection("uploadListDB");
@@ -386,14 +388,67 @@ elseif (count($_GET>0)){
 								echo 'video has already exists!';
 								echo '<script>setTimeout(function() { document.location.href="./display.php";}, 1500);</script>';
 						}
+}catch(Exception $e){
+		$db->lastError();
+		var_dump($e);
+}
 
-						$query = "INSERT INTO $table (id,title ,published,content,category,duration,favoriteCount,viewCount,author,keyword,uid) VALUES ('$id','$title',$published,'$content',$duration,$favoriteCount,$viewCount,'$author','$keyword',$uid )";
+
+
 				}
 				elseif($_GET['operation']=='update'){//TODO
-						$query = "UPDATE $table SET title='$title',content='$content',category='$category',duration=$duration,author='$author',keyword='$keyword' WHERE id=$id";
+						
+						$vid= $_GET['vid'];
+						$title = $_GET['title'];
+						$content = $_GET['content'];
+						$category = $_GET['category'];
+						$duration = $_GET['duration'];
+						$favoriteCount = 0;
+						$viewCount = 0;
+						$author = $_GET['author'];
+						$keyword = $_GET['keyword'];
+						$uid = $_SESSION['uid'];
+						//$tag = 'tag';
+						$dislike= 0;
+						$db = mongoConnect();
+						$collection=$db->selectCollection($videoDB);
+						try{
+						$query = [ 'uid' => $_SESSION['uid'] , 'vid' => $vid ];
+						$ops = [ '$set' => 
+									[ "title" => $title , "content" => $content , 'category' => $category , 
+											'duration' => $duration , 'author' => $author , 'keyword' => $keyword
+									]
+								];
+						$collection->update($query,$ops);
+						$collection=$db->selectCollection("uploadListDB");
+						$query = [ 'uid' => $_SESSION['uid'] , 'vid' => $vid ];
+						$doc = [ '$set' => ['title' => $title ] ];
+						$collection->update($query,$doc);
+						echo 'successful';
+						echo '<script>setTimeout(function(){document.location.href="./display.php";},1500);</script>';
+						}catch(Exception $e){
+								echo 'fail update';
+						echo '<script>setTimeout(function(){document.location.href="./display.php";},1500);</script>';
+						}
 				}
 				elseif($_GET['operation']=='delete'){//TODO
 						//TODO
+						try{
+						$db = mongoConnect();
+						$query = [ 'uid' => $_SESSION['uid'] , 'vid' => $_GET['vid'] ];
+						$collection=$db->selectCollection("uploadListDB");
+						$collection->remove($query);
+						$collection=$db->selectCollection($videoDB);
+						$collection->remove($query);
+						}catch(Exception $e){
+								var_dump($db->lastError());
+								var_dump($e);
+						}
+						echo 'successful';
+						echo '<script>setTimeout(function(){document.location.href="./display.php";},1500);</script>';
+				}
+				else{
+						echo 'manageVideo+operation???';
 				}
 		}
 		elseif($type=='command'){
