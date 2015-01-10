@@ -15,7 +15,8 @@ else{
 <link rel="stylesheet" type="text/css" href="style.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="./css/bootstrap.min.css" rel="stylesheet" media="screen">
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js">
+<script type="text/javascript" src="./js/jquery.min.js">
+<script type="text/javascript" src="./js/jquery.masonry.min.js">
 <script src="./js/bootstrap.min.js"></script>
 <script src="http://platform.twitter.com/widgets.js" async></script>
 
@@ -27,6 +28,7 @@ var db="mysql";
 var obj;
 var name;
 var uid;
+var count=0;
 //db = "mysql";
 db = "mongo";
 function clearDiv(){
@@ -169,7 +171,7 @@ function getData(method,data) {
 										//$("#video").html();
 										tmp=req.responseText;
 										try {
-												obj = JSON.parse(tmp);
+												videoJson = JSON.parse(tmp);
 										} 
 										catch (e) {
 												clearDiv("#message");
@@ -188,12 +190,12 @@ function getData(method,data) {
 
 												return;
 										}
-										$("#title").val(obj.title);
-										$("#content").val(obj.content);
-										$("#category").val(obj.category);
-										$("#duration").val(obj.duration);
-										$("#author").val(obj.author);
-										$("#keyword").val(obj.keyword);
+										$("#title").val(videoJson.title);
+										$("#content").val(videoJson.content);
+										$("#category").val(videoJson.category);
+										$("#duration").val(videoJson.duration);
+										$("#author").val(videoJson.author);
+										$("#keyword").val(videoJson.keyword);
 								}
 						};
 				}
@@ -205,10 +207,10 @@ function getData(method,data) {
 										//TODO if fail:disable button;else update likecount;
 										tmp=req.responseText;
 										try {
-												obj = JSON.parse(tmp);
-												$("#likeNum").html(obj.favoriteCount);
+												videoJson = JSON.parse(tmp);
+												$("#likeNum").html(videoJson.favoriteCount);
 												try{
-														$("#dislikeNum").html(obj.dislike);
+														$("#dislikeNum").html(videoJson.dislike);
 												}catch( ev){
 														$("#dislikeNum").html('0');
 												}
@@ -367,8 +369,7 @@ function parseJsonToList(message,obj){
 				catch( e){
 						obj[i].published = mongoIDToDate(obj[i]._id.$id);
 				}
-				//obj[i].published=time;
-				
+				//obj[i].published=time;	
 				/**/
 				innerstring+='<div class="videoList" id="'+obj[i].vid+'" >';
 				innerstring+='<img id="'+obj[i].vid+'"src="http://i.ytimg.com/vi/'+obj[i].vid;
@@ -404,6 +405,53 @@ function parseJsonToList(message,obj){
 				innerstring='<div style="text-align:center"><h2>no result</h2></div>';
 		}
 		$("#video").html(innerstring);
+		$(window).scroll(function () {
+				    if ($(document).scrollTop() + $(window).height() >= $(document).height()) {
+				    		innerstring='';
+				    		tmpCount=count;
+					for(var i = count; i < (tmpCount+20)&&i<obj.length; i++,count++) {
+					try{
+					time = new Date(obj[i].published.sec * 1000000);
+					obj[i].published=time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
+					}
+					catch( e){
+					obj[i].published = mongoIDToDate(obj[i]._id.$id);
+					}
+					//obj[i].published=time;	
+					/**/
+					innerstring+='<div class="videoList" id="'+obj[i].vid+'" >';
+					innerstring+='<img id="'+obj[i].vid+'"src="http://i.ytimg.com/vi/'+obj[i].vid;
+					innerstring+='/mqdefault.jpg" onerror="imgError(this)" '+
+					'onClick="getData(\'playVideo\',\''+obj[i].vid+'\')"/>';
+					innerstring+='<div class="info">';
+					innerstring+='<div class="title">'+obj[i].title+'</div>';
+					if(obj[i].published&&obj[i].author&&obj[i].duration&&obj[i].viewCount){
+					innerstring+='<div class="published">'+obj[i].published+'</div>';
+					innerstring+='<div class="author">'+obj[i].author;
+					innerstring+='</div><div class="duration">'+obj[i].duration+'</div>';
+					innerstring+='<div class="viewCount">'+obj[i].viewCount+'</div>';
+					}
+					innerstring+='</div>';
+					if(obj[i].uid&&uid==obj[i].uid.$id&&$("#message").html()=='upload List'){
+							innerstring+='<span class="listEditor">'+
+									'<button class="btn-mini btn-info" '+
+									'onclick="var setOpt=new Object();setOpt.vid=\''+obj[i].vid+
+									'\';setOpt.page=\'./manage.html\';'+
+									'setOpt.mod=\'update\';getData(\'getPage\',setOpt);">'+
+									'<img class="icon" src="image/edit.png"/>'+'</button>'+
+									'<button class="btn-mini btn-danger" '+
+									'onclick="var setOpt=new Object();setOpt.vid=\''+obj[i].vid+
+									'\';setOpt.page=\'./manage.html\';'+
+									'setOpt.mod=\'delete\';getData(\'getPage\',setOpt);">'+
+									'<img class="icon" src="image/delete.png"/>'+
+									'</button></span>';
+							//htmlcode+='<a class="btn btn-info" id="likes" onclick="getData(\'like\',\''+videoJson.vid+'\')">';
+					}
+					innerstring+='<span class="jsondata">'+JSON.stringify(obj[i])+'</span></div>';
+					}
+					$("#video").html($("#video").html()+innerstring);
+					}
+		});
 		//console.log("###!"+$("#"+obj[0].vid+" .jsondata").text());
 
 }
@@ -412,7 +460,7 @@ function playvideo(){
 				commentHtmlCode='';
 				tmp = req.responseText;
 				try{
-						obj = JSON.parse(tmp);
+						videoJson = JSON.parse(tmp);
 				}catch (e){
 						console.log('fail on processCommentReqChange');
 						console.log(tmp);
@@ -420,7 +468,6 @@ function playvideo(){
 				}
 
 				//tmp = video.getElementsByClassName('jsondata')[0].innerHTML;
-				videoJson=obj;
 				$("#message").html('');
 				//		$("#message").css({"font-size":"1.1em","font-weight":"bolder"});
 				htmlcode='';
