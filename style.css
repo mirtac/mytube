@@ -50,9 +50,9 @@ width:550px;
 	  background-color:#CC66FF;
 }*/
 .videoList:hover{
-background-color:rgba(176, 204, 209, 0.68);
+background-color:rgba(188, 211, 236, 0.88);
 transition:1s;
-box-shadow: 0 3px 5px rgba(253, 25, 25, 0.4);
+box-shadow: 0 8px 8px rgba(253, 25, 25, 0.4);
 }
 .relationVideo .videoList{
 position:relative;
