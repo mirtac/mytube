@@ -13,8 +13,8 @@
 <input type="text" name="email" placeholder="email"></input><br>
 <input type="text" name="name" placeholder="name"></input><br>
 <input type="hidden" name="type" value="create" />
-<input type="submit" />
-<input type="reset" /><br>
+<button type="submit" class="btn_my">create</button>
+<button type="reset" class="btn_my">reset</button>
 </form>
 
 </body>

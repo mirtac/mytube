@@ -640,7 +640,7 @@ function mongoIDToDate(objID){//return YYYY/MM/DD
 	<div class="searchBox">
 		<form method="post" name="info">
 		<input type="text" id="search" name="search" placeholder="search"></input>
-		<input type="button" onClick="getPostData('search')" value="search"/>
+		<button type="button" class="btn_my" onClick="getPostData('search')" value="search">search</button>
 		<!--img class="icon" src="image/gear.png" onClick="advSearch()"/-->
 		<select name="orderBy" id="order"> 
 		<option value="" selected="selected">--order by--</option>

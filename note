@@ -1,5 +1,3 @@
-tmp:db.test.name's index be removed tmp,
-
 mongo
 
 db.record.find({$or:[{content:/.*video by M.*/},{title:/.*PSY.*/}]});
