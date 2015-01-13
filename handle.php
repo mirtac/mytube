@@ -38,8 +38,8 @@ function mongoConnect(){
 <body>
 <?php
 */
-$videoDB = 'test';
-//$videoDB = 'record';
+//$videoDB = 'test';
+$videoDB = 'record';
 if(count($_POST)>0){
 		//if(!strcmp($_POST["type"],"create")){
 		if($type=='create'){
