@@ -306,6 +306,7 @@ function processListReqChange(){
 }
 function processSearchReqChange(){
 		if(req.readyState==4){
+				var obj;
 				end = new Date().getTime();
 				tmp = req.responseText;
 				//$("#video").html(tmp);
@@ -328,6 +329,7 @@ function processTestReqChange(){
 }
 function processCommentReqChange(){
 		if(req.readyState==4){
+				var obj;
 				commentHtmlCode='';
 				tmp = req.responseText;
 				try{
@@ -354,7 +356,7 @@ function processCommentReqChange(){
 				//console.log(commentHtmlCode);
 		}
 }
-function parseJsonToList(message,obj,where){
+function parseJsonToList(message,parseObj,where){
 		var innerstring='';
 		if(where){}
 		else{
@@ -363,104 +365,105 @@ function parseJsonToList(message,obj,where){
 		if(message!=""){
 				$("#message").html(message);
 		}
-		//for(var i = 0; i < obj.length; i++) {
+		//for(var i = 0; i < parseObj.length; i++) {
 		count=0;
-		for(var i = 0; i < 20&&i<obj.length; i++,count++) {
+		for(var i = 0; i < 20&&i<parseObj.length; i++,count++) {
 				/*date transfer*/
 				try{//should *1000,because wrong in put data to db
-						time = new Date(obj[i].published.sec * 1000000);
-						obj[i].published=time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
+						time = new Date(parseObj[i].published.sec * 1000000);
+						parseObj[i].published=time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
 				}
 				catch( e){
-						obj[i].published = mongoIDToDate(obj[i]._id.$id);
+						parseObj[i].published = mongoIDToDate(parseObj[i]._id.$id);
 				}
-				//obj[i].published=time;	
+				//parseObj[i].published=time;	
 				/**/
-				innerstring+='<div class="videoList" id="'+obj[i].vid+'" >';
-				innerstring+='<img id="'+obj[i].vid+'"src="http://i.ytimg.com/vi/'+obj[i].vid;
+				innerstring+='<div class="videoList" id="'+parseObj[i].vid+'" >';
+				innerstring+='<img id="'+parseObj[i].vid+'"src="http://i.ytimg.com/vi/'+parseObj[i].vid;
 				innerstring+='/mqdefault.jpg" onerror="imgError(this)" '+
-						'onClick="getData(\'playVideo\',\''+obj[i].vid+'\')"/>';
+						'onClick="getData(\'playVideo\',\''+parseObj[i].vid+'\')"/>';
 				innerstring+='<div class="info">';
-				innerstring+='<div class="title">'+obj[i].title+'</div>';
-				if(obj[i].published&&obj[i].author&&obj[i].duration&&obj[i].viewCount){
-						innerstring+='<div class="published">'+obj[i].published+'</div>';
-						innerstring+='<div class="author">'+obj[i].author;
-						innerstring+='</div><div class="duration">'+obj[i].duration+'</div>';
-						innerstring+='<div class="viewCount">'+obj[i].viewCount+'</div>';
+				innerstring+='<div class="title">'+parseObj[i].title+'</div>';
+				if(parseObj[i].published&&parseObj[i].author&&parseObj[i].duration&&parseObj[i].viewCount){
+						innerstring+='<div class="published">'+parseObj[i].published+'</div>';
+						innerstring+='<div class="author">'+parseObj[i].author;
+						innerstring+='</div><div class="duration">'+parseObj[i].duration+'</div>';
+						innerstring+='<div class="viewCount">'+parseObj[i].viewCount+'</div>';
 				}
 				innerstring+='</div>';
-				if(obj[i].uid&&uid==obj[i].uid.$id&&$("#message").html()=='upload List'){
+				if(parseObj[i].uid&&uid==parseObj[i].uid.$id&&$("#message").html()=='upload List'){
 						innerstring+='<span class="listEditor">'+
 							'<button class="btn-mini btn-info" '+
-							'onclick="var setOpt=new Object();setOpt.vid=\''+obj[i].vid+
+							'onclick="var setOpt=new Object();setOpt.vid=\''+parseObj[i].vid+
 								'\';setOpt.page=\'./manage.html\';'+
 								'setOpt.mod=\'update\';getData(\'getPage\',setOpt);">'+
 								'<img class="icon" src="image/edit.png"/>'+'</button>'+
 							'<button class="btn-mini btn-danger" '+
-								'onclick="var setOpt=new Object();setOpt.vid=\''+obj[i].vid+
+								'onclick="var setOpt=new Object();setOpt.vid=\''+parseObj[i].vid+
 								'\';setOpt.page=\'./manage.html\';'+
 								'setOpt.mod=\'delete\';getData(\'getPage\',setOpt);">'+
 							'<img class="icon" src="image/delete.png"/>'+
 							'</button></span>';
 				//htmlcode+='<a class="btn btn-info" id="likes" onclick="getData(\'like\',\''+videoJson.vid+'\')">';
 				}
-				innerstring+='<span class="jsondata">'+JSON.stringify(obj[i])+'</span></div>';
+				innerstring+='<span class="jsondata">'+JSON.stringify(parseObj[i])+'</span></div>';
 		}
-		if(obj.length==0){
+		if(parseObj.length==0){
 				innerstring='<div style="text-align:center"><h2>no result</h2></div>';
 				$(where).html(innerstring);
 				return;
 		}
 		$(where).html(innerstring);
+		$(window).off("scroll");
 		$(window).scroll(function () {
 				    if ($(document).scrollTop() + $(window).height() >= $(document).height()) {
 				    		innerstring='';
 				    		tmpCount=count;
-				    if(count<20)return;
-					for(var i = count; i < (tmpCount+20)&&i<obj.length; i++,count++) {
+				    if(parseObj.length<20)return;
+					for(var i = count; i < (tmpCount+20)&&i<parseObj.length; i++,count++) {
 					try{
-					time = new Date(obj[i].published.sec * 1000000);
-					obj[i].published=time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
+					time = new Date(parseObj[i].published.sec * 1000000);
+					parseObj[i].published=time.getFullYear()+"/"+time.getMonth()+"/"+time.getDate();
 					}
 					catch( e){
-					obj[i].published = mongoIDToDate(obj[i]._id.$id);
+					parseObj[i].published = mongoIDToDate(parseObj[i]._id.$id);
 					}
-					//obj[i].published=time;	
+					//parseObj[i].published=time;	
 					/**/
-					innerstring+='<div class="videoList" id="'+obj[i].vid+'" >';
-					innerstring+='<img id="'+obj[i].vid+'"src="http://i.ytimg.com/vi/'+obj[i].vid;
+					innerstring+='<div class="videoList" id="'+parseObj[i].vid+'" >';
+					innerstring+='<img id="'+parseObj[i].vid+'"src="http://i.ytimg.com/vi/'+parseObj[i].vid;
 					innerstring+='/mqdefault.jpg" onerror="imgError(this)" '+
-					'onClick="getData(\'playVideo\',\''+obj[i].vid+'\')"/>';
+					'onClick="getData(\'playVideo\',\''+parseObj[i].vid+'\')"/>';
 					innerstring+='<div class="info">';
-					innerstring+='<div class="title">'+obj[i].title+'</div>';
-					if(obj[i].published&&obj[i].author&&obj[i].duration&&obj[i].viewCount){
-					innerstring+='<div class="published">'+obj[i].published+'</div>';
-					innerstring+='<div class="author">'+obj[i].author;
-					innerstring+='</div><div class="duration">'+obj[i].duration+'</div>';
-					innerstring+='<div class="viewCount">'+obj[i].viewCount+'</div>';
+					innerstring+='<div class="title">'+parseObj[i].title+'</div>';
+					if(parseObj[i].published&&parseObj[i].author&&parseObj[i].duration&&parseObj[i].viewCount){
+					innerstring+='<div class="published">'+parseObj[i].published+'</div>';
+					innerstring+='<div class="author">'+parseObj[i].author;
+					innerstring+='</div><div class="duration">'+parseObj[i].duration+'</div>';
+					innerstring+='<div class="viewCount">'+parseObj[i].viewCount+'</div>';
 					}
 					innerstring+='</div>';
-					if(obj[i].uid&&uid==obj[i].uid.$id&&$("#message").html()=='upload List'){
+					if(parseObj[i].uid&&uid==parseObj[i].uid.$id&&$("#message").html()=='upload List'){
 							innerstring+='<span class="listEditor">'+
 									'<button class="btn-mini btn-info" '+
-									'onclick="var setOpt=new Object();setOpt.vid=\''+obj[i].vid+
+									'onclick="var setOpt=new Object();setOpt.vid=\''+parseObj[i].vid+
 									'\';setOpt.page=\'./manage.html\';'+
 									'setOpt.mod=\'update\';getData(\'getPage\',setOpt);">'+
 									'<img class="icon" src="image/edit.png"/>'+'</button>'+
 									'<button class="btn-mini btn-danger" '+
-									'onclick="var setOpt=new Object();setOpt.vid=\''+obj[i].vid+
+									'onclick="var setOpt=new Object();setOpt.vid=\''+parseObj[i].vid+
 									'\';setOpt.page=\'./manage.html\';'+
 									'setOpt.mod=\'delete\';getData(\'getPage\',setOpt);">'+
 									'<img class="icon" src="image/delete.png"/>'+
 									'</button></span>';
 							//htmlcode+='<a class="btn btn-info" id="likes" onclick="getData(\'like\',\''+videoJson.vid+'\')">';
 					}
-					innerstring+='<span class="jsondata">'+JSON.stringify(obj[i])+'</span></div>';
+					innerstring+='<span class="jsondata">'+JSON.stringify(parseObj[i])+'</span></div>';
 					}
 					$("#video").html($("#video").html()+innerstring);
 					}
 		});
-		//console.log("###!"+$("#"+obj[0].vid+" .jsondata").text());
+		//console.log("###!"+$("#"+parseObj[0].vid+" .jsondata").text());
 
 }
 function playvideo(){

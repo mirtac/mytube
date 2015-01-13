@@ -242,7 +242,7 @@ elseif (count($_GET>0)){
 
 		}
 		elseif($type=='getlist'){
-				$limitCount=20;
+				$limitCount=500;
 				$skipCount=0;
 				//TODO check whether isSet ($_GET)[$which,$title,$vid]
 				$which = $_GET['which'];
