@@ -12,9 +12,9 @@ else{
 <html>
 
 <head>
-<link rel="stylesheet" type="text/css" href="style.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="./css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link rel="stylesheet" type="text/css" href="style.css">
 <script type="text/javascript" src="./js/jquery.min.js">
 <script type="text/javascript" src="./js/jquery.masonry.min.js">
 <script src="./js/bootstrap.min.js"></script>
@@ -32,13 +32,13 @@ var count=0;
 //db = "mysql";
 db = "mongo";
 function clearDiv(){
-		if(arguments.length>1){
+		if(arguments.length>=1){
 				for (var i = 0; i < arguments.length; i++) {
 						$(arguments[i]).html("");
 				}
 
 		}
-		else if(arguments[0]=="all"){
+		if(arguments[0]=="all"){
 				$("#video").html("");
 				$("#videoPlay").html("");
 				$("#relationVideo").html("");
@@ -647,6 +647,7 @@ function mongoIDToDate(objID){//return YYYY/MM/DD
 		<option value="viewCount" >Views</option>
 		<option VALUE="published">Upload date</option>
 		<option VALUE="duration">Duration</option>
+		<option VALUE="score">Relevance</option>
 		</select>
 		
 		<select name="c_category" id="c_category"> 
@@ -682,6 +683,7 @@ function mongoIDToDate(objID){//return YYYY/MM/DD
 </div>
 <script>
 setUserInfo();
+getPostData('search');
 </script>
 </body>
 

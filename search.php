@@ -96,7 +96,7 @@ function mongoSearch(){
 		}
 		$sortField='_id';
 		//$sortField='viewCount';
-		$limitCount=$page * 20;
+		//$limitCount=$page * 20;
 		$limitCount=500;
 		$skipCount=($page -1) * 20;
 		//$regex = new MongoRegex('/.*'.$searchphrase.'.*/i');
@@ -120,7 +120,22 @@ function mongoSearch(){
 								'$skip' => $skipCount
 						)
 				);
-		$res = $ops;
+		//$res = $ops;
+		$res = [];
+		if(isset($_POST['search'])){
+				if($_POST['search'] != ""){
+						$searchphrase=$_POST['search'];
+						$res = array_merge($res ,
+										[array('$match' => array( '$text' => ['$search'=>$searchphrase]) )] );
+						}
+		}else{
+				if($_POST['sortField'] != ""){
+						$sortField='viewCount';
+						$res = array_merge($res ,
+										[array('$sort' => [ $sortField => -1]  )]   ) ;
+				}
+		}
+
 		$i=1;
 		if(isset($_POST['category'])){
 				if($_POST['category'] != ""){
@@ -131,11 +146,19 @@ function mongoSearch(){
 						}
 		}
 		if(isset($_POST['sortField'])){
+				//db.test.aggregate({$match:{$text:{$search:"Music"}}},{$sort: { score: { $meta: "textScore" } }  })
 				if($_POST['sortField'] != ""){
 						$sortField=$_POST['sortField'];
-						$res = array_merge($res ,
-						[array('$sort' => [ $sortField => -1]  )]   ) ;
+						if($sortField!='score'){
+								$res = array_merge($res ,
+								[array('$sort' => [ $sortField => -1]  )]   ) ;
 						}
+						else{
+								$res = array_merge($res ,
+								[['$sort' => ['score' => ['$meta'=>'textScore']]]] );
+						}
+						//var_dump($res);return;
+				}
 		}
 		$res = array_merge($res , [['$limit' => $limitCount]]);
 		//$result= $collection->aggregate($ops);
