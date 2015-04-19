@@ -249,8 +249,11 @@ elseif (count($_GET>0)){
 				if($which=='history'||$which=='upload'||$which=='favorite'){
 						$which .= 'ListDB';
 				}
-				else{
+/*		elseif($which==''){
+				}
+*/		else{
 						echo "something wrong at getList";
+						return;
 				}
 				$db = mongoConnect();
 				$collection=$db->selectCollection($which);
@@ -480,7 +483,33 @@ try{
 				//echo $row."\n";
 				}
 
+		}elseif ($type=='comment'){
+				//echo 'text='.$textpost.'<br/>';
+				//echo 'name='.$name.'<br/>';
+				//echo 'aid='.$aid.'<br/>';
+				//echo 'mid='.$mid.'<br/>';
+				$db = mongoConnect();
+				$collection=$db->selectCollection("commentDB");
+				$commentGetQuery = [ 'uid' => $_SESSION['uid'] ] ;
+
+				$result = $collection->find($commentGetQuery)->sort(['_id' => -1]);
+				$result->timeout(-1);
+				$isFirst=true;
+				echo '[';
+				foreach($result as $k => $row){
+						if(!$isFirst){
+								echo ',';
+						}
+						else {$isFirst=false;}
+						echo '{"name":"'.$row['name'].'","content":"'.$row['content'].'","time":"'.date('Y-m-d',$row['_id']->getTimestamp()).'","cid":"'.$row['_id'].'","vid":"'.$row['vid'].'","uid":"'.$row['uid'].'"}';
+						//echo json_encode($row);
+				}
+				echo ']';
+
+
+				return;
 		}
+
 		else{
 				echo 'not define get method';
 				//	echo '<script>document.location.href="./wall.php"</script>';

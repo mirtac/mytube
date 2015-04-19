@@ -113,12 +113,7 @@ function getData(method,data) {
 				else if(method=='comment'){
 						url = 'handle.php';
 						req.onreadystatechange = processCommentReqChange;
-						parameter="?type=comment&vid="+data.vid;
-						if($("#comment").val() ==''){
-						}
-						else{
-								parameter+="&message="+$("#comment").val();
-						}
+						parameter="?type=comment";
 				}
 				else if(method=='test'){
 						url = 'handle.php';
@@ -142,6 +137,7 @@ function getData(method,data) {
 				}
 				else if(method=='getPage'){
 						clearDiv('all');
+						$("#message").html("");
 						url = data.page;
 						parameter='';
 						req.onreadystatechange = function(){
@@ -516,7 +512,7 @@ function playvideo(){
 				}
 
 
-				obj.length=0;
+				if(obj)obj.length=0;
 				count=0;
 				//tmp = video.getElementsByClassName('jsondata')[0].innerHTML;
 //				$("#message").html('');
@@ -577,6 +573,12 @@ function showList(listname){
 		}catch(e){}
 		count=0;
 		$("#userbtn").attr('class','btn-group');
+		if(listname=='comment'){
+				clearDiv('all');
+				getData("comment",listname);
+
+				return true;
+		}
 		getData("getlist",listname);
 		return true;
 }
